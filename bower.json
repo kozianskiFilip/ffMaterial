@@ -1,0 +1,27 @@
+{
+  "name": "ffMaterial",
+  "authors": [
+    "Filip <filip.kozianski@outlook.com>"
+  ],
+  "description": "",
+  "main": "index.hmtl",
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "material-design-lite": "^1.3.0",
+    "amcharts3": "^3.21.12"
+  },
+  "dependencies": {
+    "jquery": "^3.3.1",
+    "material-design-lite": "^1.3.0",
+    "moment": "^2.22.1"
+  }
+}
