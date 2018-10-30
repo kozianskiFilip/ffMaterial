@@ -128,4 +128,5 @@
         //print_r ($dataArray);
         $dataArray=array_merge($scrapsSummary, array('DANE' => $dataArray));
 		echo json_encode($dataArray,JSON_NUMERIC_CHECK);
+		oci_close($ffmes_connection);
 ?>

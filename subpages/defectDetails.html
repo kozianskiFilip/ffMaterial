@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../tire.png">
+    <title>Final Finishing</title>
+    <script src="../bower_components/amcharts3/amcharts/amcharts.js"></script>
+    <script src="../bower_components/amcharts3/amcharts/serial.js"></script>
+    <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="../bower_components/moment/moment.js"></script>
+    <link rel="stylesheet" href="../bower_components/material-design-lite/material.min.css">
+    <script src="../bower_components/material-design-lite/material.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <script src="../js/defDetails.js"></script>
+    <link rel="stylesheet" href="../css/mainStyle.css">
+    <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <link href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css"
+          rel = "stylesheet">
+</head>
+
+<body>
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+<main class="mdl-layout__content" id="section-to-print">
+    <div class="page-content">
+        <div class="mdl-grid  mdl-grid--no-spacing">
+            <div class = "mdl-layout-spacer"></div>
+            <div id="defectHistory" style=" height:300px;" class="mdl-cell mdl-cell--12-col-phone mdl-cell--10-col-desktop mdl-cell--10-col-tablet">
+                <div id="p1" class="mdl-progress mdl-js-progress mdl-progress__indeterminate" style="width:100%;"></div>
+            </div>
+            <div class = "mdl-layout-spacer"></div>
+        </div>
+
+        <div class="mdl-grid  mdl-grid--no-spacing">
+            <div class = "mdl-layout-spacer"></div>
+            <div id="defectWorstCodes" style=" background-color: #37cc34;height:200px;" class="mdl-cell mdl-cell--12-col-phone mdl-cell--5-col-desktop mdl-cell--10-col-tablet">
+                <div id="p2" class="mdl-progress mdl-js-progress mdl-progress__indeterminate" style="width:100%;"></div>
+            </div>
+            <div id="defectWorstMachines" style=" background-color: #c3cc18;height:200px;" class="mdl-cell mdl-cell--12-col-phone mdl-cell--5-col-desktop mdl-cell--10-col-tablet">
+                <div id="p2" class="mdl-progress mdl-js-progress mdl-progress__indeterminate" style="width:100%;"></div>
+            </div>
+            <div class = "mdl-layout-spacer"></div>
+        </div>
+
+        <div class="mdl-grid  mdl-grid--no-spacing" >
+            <div class = "mdl-layout-spacer"></div>
+            <div class="mdl-cell mdl-cell--12-col-phone mdl-cell--10-col-desktop mdl-cell--10-col-tablet" id="list">
+                <!--<table  class="mdl-data-table mdl-js-data-table mdl-shadow&#45;&#45;2dp">-->
+                    <!--<thead>-->
+                    <!--<tr>-->
+                        <!--<th>LP</th>-->
+                        <!--<th>DEF</th>-->
+                        <!--<th>DESC</th>-->
+                        <!--<th>GT</th>-->
+                        <!--<th>CT</th>-->
+                        <!--<th>BARCODE</th>-->
+                        <!--<th>PRESS</th>-->
+                        <!--<th>CURE_DATE</th>-->
+                        <!--<th>TBM</th>-->
+                        <!--<th>TBM_DATE</th>-->
+                        <!--<th>SIZE</th>-->
+                    <!--</tr>-->
+                    <!--</thead>-->
+                <!--</table>-->
+            </div>
+            <div class = "mdl-layout-spacer"></div>
+        </div>
+    </div>
+</main>
+</div>
+
+</body>
+</html>

@@ -24,10 +24,41 @@
 .material-icons {
   vertical-align: -25%;
 }
-.mdl-data-table th, td{
+.mdl-data-table th{
+  text-align: center;
+}
+.mdl-data-table td{
   text-align: center;
 }
 .center{
   text-align:center;
 }
 
+.positiveCell {
+   background-color: @positiveColor;
+   color: white;
+ }
+
+.negativeCell {
+  background-color: @negativeColor;
+  color: white;
+}
+
+.neutralCell {
+  background-color: @neutralColor;
+  font-weight: bold;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #section-to-print, #section-to-print * {
+    visibility: visible;
+  }
+  #section-to-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+}

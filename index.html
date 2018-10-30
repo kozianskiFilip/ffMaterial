@@ -9,12 +9,14 @@
     <script src="bower_components/amcharts3/amcharts/serial.js"></script>
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="bower_components/moment/moment.js"></script>
-
     <link rel="stylesheet" href="bower_components/material-design-lite/material.min.css">
     <script src="bower_components/material-design-lite/material.min.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <script src="js/mainPage.js"></script>
     <link rel="stylesheet" href="css/mainStyle.css">
+    <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <link href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css"
+          rel = "stylesheet">
 </head>
 <body>
 
@@ -32,24 +34,39 @@
                     <a class="mdl-navigation__link" target="_blank" href="http://plda5l2">L2</a>
                     <a class="mdl-navigation__link" target="_blank" href="http://172.22.11.18/usc">USC</a>
                     <a class="mdl-navigation__link" target="_blank" href="http://172.22.11.18/stk">STK</a>
-                    <a class="mdl-navigation__link" target="_blank" href="http://172.22.11.18/sbs">SBS</a>
+                    <a class="mdl-navigation__link is-active" target="_blank" href="http://172.22.11.18/sbs">SBS</a>
                 </nav>
             </div>
         </header>
         <div class="mdl-layout__drawer">
             <span class="mdl-layout-title">Title</span>
             <nav class="mdl-navigation">
-                <a class="mdl-navigation__link" href="http://172.22.8.62:8095/curmes/Start.aspx">CUREMES</a>
+
+                <div class="mdl-layout--small-screen-only">
+                    <hr></hr>
+                    <a class="mdl-navigation__link" target="_blank" href="http://172.22.8.62:8095/curmes/ShiftRepSum.aspx">CUREMES</a>
+                    <a class="mdl-navigation__link" target="_blank" href="http://plda5l2">L2</a>
+                    <a class="mdl-navigation__link" target="_blank" href="http://172.22.11.18/usc">USC</a>
+                    <a class="mdl-navigation__link" target="_blank" href="http://172.22.11.18/stk">STK</a>
+                    <a class="mdl-navigation__link is-active" target="_blank" href="http://172.22.11.18/sbs">SBS</a>
+                </div>
+
+                <a class="mdl-navigation__link">
+                    <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-2">
+                        <input type="checkbox" id="switch-2" class="mdl-switch__input" disabled>
+                        <span class="mdl-switch__label" ></span>
+                    </label>
+                </a>
             </nav>
         </div>
 
 
-        <main class="mdl-layout__content">
+        <main class="mdl-layout__content" id="section-to-print">
             <div class="page-content">
                 <!--TABELA DANYCH-->
-                <div class="mdl-grid">
+                <div class="mdl-grid mdl-grid--no-spacing">
                     <div class = "mdl-layout-spacer"></div>
-                    <div class="mdl-cell mdl-cell--12-col-phone mdl-cell--10-col-desktop mdl-cell--12-col-tablet mdl-grid--no-spacing">
+                    <div class="mdl-cell mdl-cell--stretch mdl-cell--12-col-phone mdl-cell--10-col-desktop mdl-cell--12-col-tablet ">
                         <table  class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
                             <thead>
                             <tr>
@@ -61,29 +78,20 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td id="curing"></td>
-                                    <td id="inspection"></td>
-                                    <td id="fvm"></td>
-                                    <td id="stock">
-                                        <div id = "tooltip4" class = "icon material-icons">share</div>
-                                        <div class = "mdl-tooltip" for = "tooltip4">
-                                            tooltip test
-                                        </div>
-                                    </td>
+                                    <td id="curing" style="text-align: center; font-weight: bold;" class="negativeCell"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
+                                    <td id="inspection" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
+                                    <td id="fvm" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
+                                    <td id="stock" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                     <div class = "mdl-layout-spacer"></div>
                 </div>
+                <br>
 
-                <div class="mdl-grid mdl-grid--no-spacing">
-                    <div class = "mdl-layout-spacer"></div>
-                    <div  style=" height:100px;background-color: #CC0000" class="mdl-cell mdl-cell--12-col-phone mdl-cell--5-col-desktop mdl-cell--10-col-tablet"></div>
-                    <div  style=" height:100px;background-color: #00acc1" class="mdl-cell mdl-cell--stretch mdl-cell--12-col-phone mdl-cell--5-col-desktop mdl-cell--10-col-tablet "></div>
-                    <div class = "mdl-layout-spacer"></div>
-                </div>
-
+                <button onclick="$('#section-to-print').load('include/scraps_report.html');">TEST</button>
+                <button onclick="$('#backupCharts').slideToggle()">TEST2</button>
                 <!--WYKRES WYBRAKÓW-->
                 <div class="mdl-grid  mdl-grid--no-spacing">
                     <div class = "mdl-layout-spacer"></div>
@@ -92,11 +100,83 @@
                     </div>
                     <div class = "mdl-layout-spacer"></div>
                 </div>
+
+                <div id="backupCharts" class="mdl-grid mdl-grid--no-spacing"  style="display:none;">
+                    <div class = "mdl-layout-spacer"></div>
+                    <div id="backupChart1" class="mdl-cell mdl-cell--12-col-phone mdl-cell--5-col-desktop mdl-cell--10-col-table" style="height:150px; background-color: #00b0ff;"></div>
+                    <div id="backupChart2" class="mdl-cell mdl-cell--12-col-phone mdl-cell--5-col-desktop mdl-cell--10-col-table" style="height:150px; background-color: #00b0ff;"></div>
+                    <div class = "mdl-layout-spacer"></div>
+                </div>
+                <!--TABELA FVM-->
+                <div class="mdl-grid mdl-grid--no-spacing">
+                    <div class = "mdl-layout-spacer"></div>
+                    <div class="mdl-cell mdl-cell--stretch mdl-cell--12-col-phone mdl-cell--10-col-desktop mdl-cell--12-col-tablet ">
+                        <table  class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+                            <thead>
+                            <tr>
+                                <th>FVM01</th>
+                                <th>FVM02</th>
+                                <th>FVM03</th>
+                                <th>FVM04</th>
+                                <th>FVM05</th>
+                                <th>FVM06</th>
+                                <th>FVM07</th>
+                                <th>FVM08</th>
+                                <th>FVM09</th>
+                                <th>FVM10</th>
+                                <th>FVM11</th>
+                                <th>FVM13</th>
+                                <th>FVM14</th>
+                                <th>FVM12</th>
+                                <th>FVM15</th>
+                                <th>FVM16</th>
+                                <th>FVM18</th>
+                                <th>FVM20</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td id="FVM01score" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
+                                <td id="FVM02score" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
+                                <td id="FVM03score" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
+                                <td id="FVM04score" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
+                                <td id="FVM05score" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
+                                <td id="FVM06score" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
+                                <td id="FVM07score" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
+                                <td id="FVM08score" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
+                                <td id="FVM09score" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
+                                <td id="FVM10score" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
+                                <td id="FVM11score" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
+                                <td id="FVM13score" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
+                                <td id="FVM14score" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
+                                <td id="FVM12score" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
+                                <td id="FVM15score" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
+                                <td id="FVM16score" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
+                                <td id="FVM18score" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
+                                <td id="FVM20score" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
+                            </tr>
+                            <tr><td colspan="17"></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class = "mdl-layout-spacer"></div>
+                </div>
+                <div class="mdl-grid mdl-grid--no-spacing">
+                    <div class = "mdl-layout-spacer"></div>
+                    <div  id="inspectionChart" style=" text-align:center; height:150px;" class="mdl-cell mdl-cell--12-col-phone mdl-cell--5-col-desktop mdl-cell--10-col-tablet"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></div>
+                    <div  id="curingChart" style=" text-align:center;height:150px;" class="mdl-cell mdl-cell--stretch mdl-cell--12-col-phone mdl-cell--5-col-desktop mdl-cell--10-col-tablet "><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></div>
+                    <div class = "mdl-layout-spacer"></div>
+                </div>
             </div>
         </main>
 
+        <!--<footer class = "mdl-mega-footer">-->
+            <!--<div class = "mdl-mega-footer__top-section"> -->
+                <!--<div class = "mdl-mega-footer__left-section">-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</footer>-->
     </div>
-
 </body>
 
 </html>
