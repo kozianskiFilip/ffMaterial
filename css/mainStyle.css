@@ -38,6 +38,7 @@ th {
 }
 .neutralCell {
   background-color: #FFEB3B;
+  color: black;
   font-weight: bold;
 }
 @media print {

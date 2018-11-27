@@ -67,7 +67,9 @@
         }
 
 //DO TESTÓW
-        if(1)
+
+        //NARASTAJĄCO DOBA
+        if(mode == 0)
         {
             $end=new DateTime();
             $end->add(new DateInterval('P1D'));
@@ -75,7 +77,21 @@
             $start_hr=06;
             $end_hr=6;
         }
+        //TYLKO ZMIANA1
+        else if (mode == 1)
+        {
 
+        }
+        //TYLKO ZMIANA2
+        else if(mode == 2)
+        {
+
+        }
+        //ZMIANA3
+        else
+        {
+
+        }
 
         $scrapsSummary=array('BUILDING' => array('qty' =>0, 'color' =>'#f8fc00') , 'UNI' => array('qty' =>0, 'color' =>'#ef8904'), 'CURING' => array('qty' =>0, 'color' =>'#ef0404'));
         $dataArray=array();

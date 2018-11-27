@@ -70,14 +70,18 @@
                         <table  class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
                             <thead>
                             <tr>
-                                <th>WULKANIZACJA</th>
-                                <th>KLASOWANIE</th>
-                                <th>OPTYMIZERY</th>
-                                <th>ZDANIE</th>
+                                <th>BC3</th>
+                                <th>INV</th>
+                                <th>BC4</th>
+                                <th>FF</th>
+                                <th>FVM</th>
+                                <th>STK</th>
                             </tr>
                             </thead>
                             <tbody>
                                 <tr>
+                                    <td id="building" style="text-align: center; font-weight: bold;" class="negativeCell"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
+                                    <td id="inventory" style="text-align: center; font-weight: bold;" class="negativeCell"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
                                     <td id="curing" style="text-align: center; font-weight: bold;" class="negativeCell"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
                                     <td id="inspection" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
                                     <td id="fvm" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
@@ -91,6 +95,7 @@
                 <br>
 
                 <button onclick="$('#section-to-print').load('include/scraps_report.html');">TEST</button>
+                <button onclick="fvmPerf();">TEST3</button>
                 <button onclick="$('#backupCharts').slideToggle()">TEST2</button>
                 <!--WYKRES WYBRAKÓW-->
                 <div class="mdl-grid  mdl-grid--no-spacing">
@@ -110,11 +115,10 @@
                 <!--TABELA FVM-->
                 <div class="mdl-grid mdl-grid--no-spacing">
                     <div class = "mdl-layout-spacer"></div>
-                    <div class="mdl-cell mdl-cell--stretch mdl-cell--12-col-phone mdl-cell--10-col-desktop mdl-cell--12-col-tablet ">
+                    <div class="mdl-cell mdl-cell--stretch mdl-cell--12-col-phone mdl-cell--10-col-desktop mdl-cell--12-col-tablet" style="overflow-x:auto">
                         <table  class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
                             <thead>
                             <tr>
-                                <th>FVM01</th>
                                 <th>FVM02</th>
                                 <th>FVM03</th>
                                 <th>FVM04</th>
@@ -136,8 +140,9 @@
                             </thead>
                             <tbody>
                             <tr>
-                                <td id="FVM01score" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
-                                <td id="FVM02score" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
+                                <td id="FVM02score" style="text-align: center; font-weight: bold;">
+                                    <div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div>
+                                </td>
                                 <td id="FVM03score" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
                                 <td id="FVM04score" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
                                 <td id="FVM05score" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
@@ -155,9 +160,46 @@
                                 <td id="FVM18score" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
                                 <td id="FVM20score" style="text-align: center; font-weight: bold;"><div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div></td>
                             </tr>
-                            <tr><td colspan="17"></td></tr>
+                            <!--INFO ABOUT STATUTS/DOWNTIME-->
+                            <tr>
+                                <td id="FVM02status" style="text-align: center; font-weight: bold;"></td>
+                                <td id="FVM03status" style="text-align: center; font-weight: bold;"></td>
+                                <td id="FVM04status" style="text-align: center; font-weight: bold;"></td>
+                                <td id="FVM05status" style="text-align: center; font-weight: bold;"></td>
+                                <td id="FVM06status" style="text-align: center; font-weight: bold;"></td>
+                                <td id="FVM07status" style="text-align: center; font-weight: bold;"></td>
+                                <td id="FVM08status" style="text-align: center; font-weight: bold;"></td>
+                                <td id="FVM09status" style="text-align: center; font-weight: bold;"></td>
+                                <td id="FVM10status" style="text-align: center; font-weight: bold;"></td>
+                                <td id="FVM11status" style="text-align: center; font-weight: bold;"></td>
+                                <td id="FVM13status" style="text-align: center; font-weight: bold;"></td>
+                                <td id="FVM14status" style="text-align: center; font-weight: bold;"></td>
+                                <td id="FVM12status" style="text-align: center; font-weight: bold;"></td>
+                                <td id="FVM15status" style="text-align: center; font-weight: bold;"></td>
+                                <td id="FVM16status" style="text-align: center; font-weight: bold;"></td>
+                                <td id="FVM18status" style="text-align: center; font-weight: bold;"></td>
+                                <td id="FVM20status" style="text-align: center; font-weight: bold;"></td>
+                            </tr>
                             </tbody>
                         </table>
+                        <!--HINTS FOR FVM - DETAILS ABOUT SCREENING-->
+                        <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;" for="FVM02score" id="FVM02tooltip">asdasd</div>
+                        <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;" for="FVM03score" id="FVM03tooltip"></div>
+                        <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;" for="FVM04score" id="FVM04tooltip"></div>
+                        <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;" for="FVM05score" id="FVM05tooltip"></div>
+                        <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;" for="FVM06score" id="FVM06tooltip"></div>
+                        <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;" for="FVM07score" id="FVM07tooltip"></div>
+                        <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;" for="FVM08score" id="FVM08tooltip"></div>
+                        <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;" for="FVM09score" id="FVM09tooltip"></div>
+                        <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;" for="FVM10score" id="FVM10tooltip"></div>
+                        <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;" for="FVM11score" id="FVM11tooltip"></div>
+                        <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;" for="FVM12score" id="FVM12tooltip"></div>
+                        <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;" for="FVM13score" id="FVM13tooltip"></div>
+                        <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;" for="FVM14score" id="FVM14tooltip"></div>
+                        <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;" for="FVM15score" id="FVM15tooltip"></div>
+                        <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;" for="FVM16score" id="FVM16tooltip"></div>
+                        <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;" for="FVM18score" id="FVM18tooltip"></div>
+                        <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;" for="FVM20score" id="FVM20tooltip"></div>
                     </div>
                     <div class = "mdl-layout-spacer"></div>
                 </div>
