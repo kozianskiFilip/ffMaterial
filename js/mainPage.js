@@ -4,6 +4,7 @@ AmCharts.lastClick = 0; // last click timestamp
 AmCharts.doubleClickDuration = 300;
 
 var chartData;
+var repairChartData;
 var inspectionChartData;
 var curingChartData;
 
@@ -12,13 +13,15 @@ var curingScraps;
 var uniScraps;
 var shift;
 var shiftPlan;
+var repairTotal;
+var massTotal;
 
 var tableInterval;
 var fvmInterval;
+var scrapInterval;
 
 var scrapChartRefreshMode=0; // DOMYŚLNIE DANE W WYKRESIE PREZENTUJĄ BIEŻĄCĄ DOBĘ
-
-
+var scrapChartAutoUpdate = 1; //AUTOMATYCZNA AKTUALIZACJA
 
 //AKCJE DO PODWÓJNEGO/POJEDYNCZEGO KLIKNIECIA NA GLOWNY WYKRES
 {
@@ -58,24 +61,15 @@ var scrapChartRefreshMode=0; // DOMYŚLNIE DANE W WYKRESIE PREZENTUJĄ BIEŻĄC�
         AmCharts.lastClick = ts;
     }
 }
-var scrapInterval;
+
+
 $(document).ready(function() {
 
     //SCRAPS CHART INIT/UPDATE
-    $.getJSON('php/getScraps.php?mode='+scrapChartRefreshMode, function(data)
-    {  //alert('xxx');
-       chartData=data.DANE;
-       buildingScraps=data.BUILDING.qty;
-       curingScraps=data.CURING.qty;
-       uniScraps=data.UNI.qty;
-       scrapsChart();
-       updateDashboard();
-    });
+
+    updateDashboard();
 
     //MAIN TABLE INIT/UPDATE
-
-
-
     statsInterval = setInterval(function () {
         $.getJSON('php/getForecast.php', function(data)
         {
@@ -93,10 +87,10 @@ $(document).ready(function() {
             $('#fvm').html("<span class='mdl-layout--large-screen-only'>"+data.MAIN_TABLE.FVM_OUTPUT+" /</span> "+data.MAIN_TABLE.FVM_FORECAST+"<br><span style='font-size: 80%'>("+(data.MAIN_TABLE.FVM_FORECAST-data.MAIN_TABLE.CURING_PRED)+")</span>");
             $('#stock').html("<span class='mdl-layout--large-screen-only'>"+data.MAIN_TABLE.STOCK+"<br><span style='font-size: 80%'>("+(data.MAIN_TABLE.STOCK-data.MAIN_TABLE.LABO)+")</span>");
 
-            inspectionChartData=data.MAIN_TABLE.SUPPORT_CHARTS.INSPECTION;
-            inspectionChart();
-            curingChartData=data.MAIN_TABLE.SUPPORT_CHARTS.CURING;
-            curingChart();
+            // inspectionChartData=data.MAIN_TABLE.SUPPORT_CHARTS.INSPECTION;
+            // inspectionChart();
+            // curingChartData=data.MAIN_TABLE.SUPPORT_CHARTS.CURING;
+            // curingChart();
         });
         },30000);
 
@@ -145,13 +139,10 @@ function mainTableFill()
             $('#inspection').removeClass().addClass('negativeCell');
 
 
-
-
-
-        inspectionChartData=data.MAIN_TABLE.SUPPORT_CHARTS.INSPECTION;
-        inspectionChart();
-        curingChartData=data.MAIN_TABLE.SUPPORT_CHARTS.CURING;
-        curingChart();
+        // inspectionChartData=data.MAIN_TABLE.SUPPORT_CHARTS.INSPECTION;
+        // inspectionChart();
+        // curingChartData=data.MAIN_TABLE.SUPPORT_CHARTS.CURING;
+        // curingChart();
     });
 }
 
@@ -161,7 +152,7 @@ function scrapsChart() {
         chart.dataProvider = chartData;
         chart.categoryField = "defectNumber";
         chart.startDuration = 1;
-        chart.addTitle("TOTAL: "+(buildingScraps+uniScraps+curingScraps)+", CURING: "+curingScraps+" / BUILDING: "+buildingScraps+" / UNI: "+uniScraps+ " "+moment().format('HH:mm:ss'));
+       // chart.addTitle("TOTAL: "+(buildingScraps+uniScraps+curingScraps)+", CURING: "+curingScraps+" / BUILDING: "+buildingScraps+" / UNI: "+uniScraps+ " "+moment().format('HH:mm:ss'));
 
         // AXES
         // category
@@ -193,18 +184,46 @@ function scrapsChart() {
         chart.addListener('clickGraphItem', AmCharts.myClickHandler);
         chart.creditsPosition = "top-right";
         chart.write("scrapChart");
-
 }
 
-function resetChart()
-{
-    chart.dataProvider = chartData;
-    chart.titles[0].text = "TOTAL "+categoryMode+" SCRAPS BY "+ updateMode + " - "+totalScraps;
-    // remove the "Go back" label
-    chart.allLabels = [];
-    chart.marginBottom=120;
-    chart.validateData();
-    chart.animateAgain();
+function supportScrapsChart(supportChartData,supportChartContainer, chartTitle) {
+    // SERIAL CHART
+    chart = new AmCharts.AmSerialChart();
+    chart.dataProvider = supportChartData;
+    chart.categoryField = "defectNumber";
+    chart.startDuration = 1;
+    chart.addTitle(chartTitle+" "+moment().format('HH:mm:ss'));
+
+    // AXES
+    // category
+    var categoryAxis = chart.categoryAxis;
+    categoryAxis.labelRotation = 30;
+    categoryAxis.gridPosition = "start";
+
+
+    // GRAPH
+    var graph = new AmCharts.AmGraph();
+
+    graph.valueField = "qty";
+    graph.balloonText = "[[desc]]: </br><b>[[text]]</b>";
+    graph.labelText="[[qty]]";
+    graph.type = "column";
+    graph.lineAlpha = 0;
+    graph.fillAlphas = 1;
+    graph.colorField= "color";
+    chart.addGraph(graph);
+
+
+    // CURSOR
+    var chartCursor = new AmCharts.ChartCursor();
+    chartCursor.cursorAlpha = 0;
+    chartCursor.zoomable = false;
+    chartCursor.categoryBalloonEnabled = false;
+    chart.addChartCursor(chartCursor);
+
+    chart.addListener('clickGraphItem', AmCharts.myClickHandler);
+    chart.creditsPosition = "top-right";
+    chart.write(supportChartContainer);
 }
 
 function updateDashboard()
@@ -212,116 +231,12 @@ function updateDashboard()
     //scrap chart update
     fvmPerf();
     fvmInterval=setInterval(fvmPerf,300000);
-    scrapInterval=setInterval(function(){
-        $.getJSON('php/getScraps.php', function(data)
-        {
-            chartData=data.DANE;
-            buildingScraps=data.BUILDING.qty;
-            curingScraps=data.CURING.qty;
-            uniScraps=data.UNI.qty;
-            chart.titles[0].text="TOTAL: "+(buildingScraps+uniScraps+curingScraps)+", CURING: "+curingScraps+" / BUILDING: "+buildingScraps+" / UNI: "+uniScraps+ " "+moment().format('HH:mm:ss');
-            chart.validateData();
-            chart.animateAgain();
-        });
-    }, 300000) ;
+
+    scrapsShift();
+    scrapInterval=setInterval(scrapsShift,300000);
 
     mainTableFill();
     tableInterval=setInterval(mainTableFill, 300000) ;
-}
-
-
-function inspectionChart() {
-    chartInspection = new AmCharts.AmSerialChart();
-    chartInspection.dataProvider = inspectionChartData;
-    chartInspection.autoMargins = false;
-    chartInspection.marginTop = 0;
-    chartInspection.marginBottom = 0;
-    chartInspection.marginLeft = 0;
-    chartInspection.marginRight = 0;
-    chartInspection.categoryField="TIMESTAMP;"
-
-    // AXES
-    // category
-    var categoryAxis = chartInspection.categoryAxis;
-
-    // value
-    var valueAxis = new AmCharts.ValueAxis();
-    valueAxis.axisAlpha = 0;
-    valueAxis.inside = true;
-    valueAxis.dashLength = 3;
-    chartInspection.addValueAxis(valueAxis);
-
-    // GRAPH
-    graph = new AmCharts.AmGraph();
-    graph.type = "smoothedLine"; // this line makes the graph smoothed line.
-    graph.lineColor = "#4e9cd1";
-    graph.negativeLineColor = "#b63733"; // this line makes the graph to change color when it drops below 0
-    graph.lineThickness = 2;
-    graph.valueField = "PRED";
-    graph.balloonText = "[[TIMESTAMP]]:<br><b><span style='font-size:14px;'>[[value]]</span></b>";
-    chartInspection.addGraph(graph);
-
-    // CURSOR
-    var chartCursor = new AmCharts.ChartCursor();
-    chartCursor.cursorAlpha = 0;
-    chartCursor.cursorPosition = "mouse";
-    chartCursor.categoryBalloonDateFormat = "YYYY";
-    chartInspection.addChartCursor(chartCursor);
-
-    // SCROLLBAR
-    var chartScrollbar = new AmCharts.ChartScrollbar();
-    chartInspection.addChartScrollbar(chartScrollbar);
-
-    chartInspection.creditsPosition = "bottom-right";
-    // WRITE
-    chartInspection.write("inspectionChart");
-}
-
-function curingChart() {
-    chartCuring = new AmCharts.AmSerialChart();
-    chartCuring.dataProvider = curingChartData;
-    chartCuring.labelsEnabled = false;
-    chartCuring.autoMargins = false;
-    chartCuring.marginTop = 0;
-    chartCuring.marginBottom = 0;
-    chartCuring.marginLeft = 0;
-    chartCuring.marginRight = 0;
-
-    // AXES
-    // category
-    var categoryAxis = chartCuring.categoryAxis;
-
-    // value
-    var valueAxis = new AmCharts.ValueAxis();
-    valueAxis.axisAlpha = 0;
-    valueAxis.inside = true;
-    valueAxis.dashLength = 3;
-    chartCuring.addValueAxis(valueAxis);
-
-    // GRAPH
-    graph = new AmCharts.AmGraph();
-    graph.type = "smoothedLine"; // this line makes the graph smoothed line.
-    graph.lineColor = "#25d12f";
-    graph.negativeLineColor = "#b63733"; // this line makes the graph to change color when it drops below 0
-    graph.lineThickness = 2;
-    graph.valueField = "PRED";
-    graph.balloonText = "[[TIMESTAMP]]:<br><b><span style='font-size:14px;'>[[value]]</span></b>";
-    chartCuring.addGraph(graph);
-
-    // CURSOR
-    var chartCursor = new AmCharts.ChartCursor();
-    chartCursor.cursorAlpha = 0;
-    chartCursor.cursorPosition = "mouse";
-    chartCursor.categoryBalloonDateFormat = "YYYY";
-    chartCuring.addChartCursor(chartCursor);
-
-    // SCROLLBAR
-    var chartScrollbar = new AmCharts.ChartScrollbar();
-    chartCuring.addChartScrollbar(chartScrollbar);
-
-    chartCuring.creditsPosition = "bottom-right";
-    // WRITE
-    chartCuring.write("curingChart");
 }
 
 function fvmPerf()
@@ -370,3 +285,32 @@ function fvmPerf()
     }
     );
 };
+
+function scrapsShift()
+{
+    $.getJSON('php/getScraps.php?mode='+scrapChartRefreshMode, function(data)
+    {
+        var autoUpdateText='<span style="color: #1b7a00; text-underline-style: wave; ">AUTOUPDATE ON</span>';
+        chartData=data.DANE;
+        buildingScraps=data.BUILDING.qty;
+        curingScraps=data.CURING.qty;
+        uniScraps=data.UNI.qty;
+        repairTotal=data.REPAIR;
+        repairChartData=data.DANE_NAPRAWA;
+        //alert(data.DANE);
+        //$('#test').html(data.DANE[1]);
+        //chart.dataProvider(chartData);
+        scrapsChart();
+        supportScrapsChart(repairChartData,'backupChart1', "NAPRAWY");
+        supportScrapsChart(data.DANE_MASY,'backupChart2', "MASY");
+
+        if(!scrapChartAutoUpdate)
+            autoUpdateText='<span style="color: #9f0012; text-underline-style: wave; ">AUTOUPDATE OFF</span>';
+       // alert(autoUpdateText);
+            $("#scrapNumbers").html("TOTAL: "+(buildingScraps+uniScraps+curingScraps)+", CURING: "+curingScraps+" / BUILDING: "+buildingScraps+" / UNI: "+uniScraps+ "/ <span style='color: #1a237e'><u>>RPR: "+repairTotal+"</u></span> "+moment().format('HH:mm:ss')+" "+autoUpdateText);
+        //chart.titles[0].text="TOTAL: "+(buildingScraps+uniScraps+curingScraps)+", CURING: "+curingScraps+" / BUILDING: "+buildingScraps+" / UNI: "+uniScraps+ " "+moment().format('HH:mm:ss');
+        // chart.validateNow();
+        // chart.validateData();
+       // chart.animateAgain();
+    });
+}
