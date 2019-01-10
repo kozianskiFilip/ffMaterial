@@ -7,7 +7,7 @@
  */
 $ffmes_connection = oci_connect('minimes_ff_wbr', 'Baza0racl3appl1cs', '172.22.8.47/ORA');
 $h=date('H');
-
+error_reporting(0);
 
 $scraps_table='';
 $start_hr;
@@ -152,6 +152,68 @@ while ($row = oci_fetch_array($stid, OCI_BOTH))
                                     );
 }
 
-$finalArray=array('SCORES' => $fvmArray, 'STATUS' => $fvmStatusArray);
+
+//BIEŻĄCA ANALIZA ROZMIARÓW
+$sizesArray=array();
+$stid2 = oci_parse($ffmes_connection,"select nvl(nvl(ctc,cgtc),ct),nvl( nvl(nvl(rozmiar,rozmiar_fvm),rozmiar_planowane),0),nvl(curing,9),nvl(formy,0),nvl(fvm,0), ct,nvl(planowane,0) from
+(
+    select ctc,rozmiar, count(barcode) curing, count(distinct resrce) formy
+    from cure_prod_log@curemes
+    left join
+    (
+    select distinct code_tic, desc_rimd ||'x'||desc_psep rozmiar from ggs_code@plda5l2 where code_act=1
+    ) on ctc=code_tic
+    where end_time between 
+    to_date('".$start." ".$start_hr.":00:00' ,'yyyy-mm-dd hh24:mi:ss') and to_date( '".$end." ".$end_hr.":00:00','yy-mm-dd hh24:mi:ss')
+    and resrce not like 'R%'
+    group by ctc, rozmiar
+)
+full outer join
+(
+    select cgtc,rozmiar rozmiar_fvm, count(char_barcode) fvm
+    from uni_raw@plda5l2
+    left join
+    (
+    select distinct code_tic, desc_rimd ||'x'||desc_psep rozmiar from ggs_code@plda5l2 where code_act=1
+    ) on cgtc=code_tic
+    where dstamp between 
+    to_date('".$start." ".$start_hr.":00:00' ,'yyyy-mm-dd hh24:mi:ss') and to_date( '".$end." ".$end_hr.":00:00','yy-mm-dd hh24:mi:ss')
+    group by cgtc,rozmiar
+) on ctc=cgtc
+full outer join
+(
+    select ct,rozmiar rozmiar_planowane, sum(pcs) planowane
+    from cur_schedule_by_press
+    left join
+    (
+    select distinct code_tic, desc_rimd ||'x'||desc_psep rozmiar from ggs_code@plda5l2 where code_act=1
+    ) on ct=code_tic
+    where prod_day=to_date('".$start."','yy-mm-dd') and shift =".$zmiana."
+    group by ct, rozmiar
+)on ctc=ct
+order by nvl(nvl(rozmiar,rozmiar_fvm),rozmiar_planowane),nvl(curing,9)");
+oci_execute($stid2);
+
+while ($row = oci_fetch_array($stid2, OCI_BOTH))
+{
+
+    if($row[1]!=0)
+    {
+        $sizesArray[$row[1]]['CALOWOSC']=$row[1];
+        $sizesArray[$row[1]]['WULKANIZACJA_TOTAL']+=$row[2];
+        $sizesArray[$row[1]]['IL_FORM_TOTAL']+=$row[3];
+        $sizesArray[$row[1]]['OPTYMIZERY_TOTAL']+=$row[4];
+        $sizesArray[$row[1]]['PLAN_TOTAL']+=$row[6];
+        $sizesArray[$row[1]]['ROZMIARY'][$row[0]]=array('WULKANIZACJA'=>$row[2],'IL_FORM' => $row[3], 'OPTYMIZERY' => $row[4], 'PLAN'=>$row[6]);
+    }
+
+
+
+
+
+}
+
+//print_r($sizesArray);
+$finalArray=array('SCORES' => $fvmArray, 'STATUS' => $fvmStatusArray, 'SIZES' => $sizesArray);
 echo json_encode($finalArray,JSON_NUMERIC_CHECK);
 //print_r($fvmArray);

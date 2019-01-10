@@ -282,7 +282,25 @@ function fvmPerf()
 
 
         }
+        //SIZES STATS
+        data = dataTotal.SIZES;
+        $('#sizesHead').html('');
+        $('#sizesCuring').html('');
+        $('#sizesFVM').html('');
+
+        $('#sizesHead').append('<th style="border-right: solid;color: #303f9f" class="mdl-layout--large-screen-only">ROZMIAR</th>');
+        $('#sizesCuring').append('<td style="border-right: solid;color: #303f9f" class="mdl-layout--large-screen-only">WULKANIZACJA</td>');
+        $('#sizesFVM').append('<td style="border-right: solid;color: #303f9f" class="mdl-layout--large-screen-only">FVM</td>');
+
+        for(iterator in data)
+        {
+            $('#sizesHead').append('<th>'+(data[iterator].CALOWOSC)+'</th>');
+            $('#sizesCuring').append('<td>'+(data[iterator].WULKANIZACJA_TOTAL)+'</br><span style="font-size:90%;">('+data[iterator].IL_FORM_TOTAL+')</span></td>');
+            $('#sizesFVM').append('<td>'+(data[iterator].OPTYMIZERY_TOTAL)+'</td>');
+        }
     }
+
+
     );
 };
 
