@@ -3,6 +3,13 @@
 @neutralColor: #FFEB3B;
 
 
+@negativeSecondaryColor: #ef5350;
+@neutralSecondaryColor: #ffeb3b;
+@positiveSecondaryColor: #66bb6a;
+
+
+
+
 .mdl-data-table {
   table-layout:fixed;
   width:100%;
@@ -63,3 +70,29 @@
     top: 0;
   }
 }
+.inspectionCell
+{
+
+  height:auto;
+  padding: 0px;
+}
+.neutralCellInspection
+ {
+   background-color: @neutralSecondaryColor;
+   border-right-style: solid;
+ }
+
+.positiveCellInspection
+{
+  background-color: @positiveSecondaryColor;
+  border-right-style: solid ;
+}
+
+.negativeCellInspection
+{
+  background-color: @negativeSecondaryColor;
+  border-right-style: solid ;
+}
+
+
+

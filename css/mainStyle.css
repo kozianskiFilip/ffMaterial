@@ -55,3 +55,19 @@ th {
     top: 0;
   }
 }
+.inspectionCell {
+  height: auto;
+  padding: 0px;
+}
+.neutralCellInspection {
+  background-color: #ffeb3b;
+  border-right-style: solid;
+}
+.positiveCellInspection {
+  background-color: #66bb6a;
+  border-right-style: solid ;
+}
+.negativeCellInspection {
+  background-color: #ef5350;
+  border-right-style: solid ;
+}
