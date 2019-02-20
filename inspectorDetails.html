@@ -1,0 +1,81 @@
+<script src="bower_components/amcharts3/amcharts/amcharts.js"></script>
+<script src="bower_components/amcharts3/amcharts/serial.js"></script>
+<script src="bower_components/jquery/dist/jquery.min.js"></script>
+<script src="bower_components/moment/moment.js"></script>
+<link rel="stylesheet" href="bower_components/material-design-lite/material.css">
+<script src="bower_components/material-design-lite/material.min.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<script src="js/mainPage.js"></script>
+<link rel="stylesheet" href="css/mainStyle.css">
+<script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+<link href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css"
+      rel = "stylesheet">
+<script>
+    var now=moment();
+    var urlParams = new URLSearchParams(window.location.search);
+    var insp = urlParams.get('inspector');
+    //var duration = moment.duration(now.diff(startDtime)).as('minutes')+10;
+
+    $('#inspectorsTab').html('');
+        $.getJSON('http://localhost/node?inspector='+insp, function(data) {
+        for(var i=0; i< data.length; i++)
+        {
+            //adr = 'inspectorDetails.html?inspector='+data[i].czasPrzerw;
+           // alert(insp);
+            $('#inspectorsTab').append('<tr style="height:auto">' +
+                '<td style="height:auto;padding:2px; white-space: normal;">'+(data[i].brakarz).toUpperCase()+'</td>' +
+                '<td style="height:auto;padding:2px;white-space: normal;">'+(data[i].id)+'</td>' +
+                '<td style="height:auto;padding:2px; white-space: normal;">'+(data[i].barcode)+'</td>' +
+                '<td style="height:auto;padding:2px; white-space: normal;'+(data[i].disp=='OK' ? 'color:green;' : 'color:red;')+'">'+(data[i].disp)+'</td>' +
+                '<td style="height:auto;padding:2px; white-space: normal;">'+(data[i].start)+'</td>' +
+                '<td style="height:auto;padding:2px; white-space: normal;">'+(data[i].koniec)+'</td>' +
+                '<td style="height:auto;padding:2px; white-space: normal;font-weight: bold;'+(data[i].czas < 3 ? ('background-color:#66bb6a;color:white;'): (data[i].czas < 5 ? ('background-color:#ffeb3b;') : (data[i].czas < 10 ? ('background-color:#ffb300;') : ('background-color:#f44336;') )))+'">'+((data[i].czas) <1 ? (((data[i].czas)*60).toFixed(0)+'s.') : (((data[i].czas)).toFixed(2)+'min.'))+'</td>' +
+                '</tr>');
+
+        }
+        $('#headerInspection').html('BRAKARZ, AKTUALIZACJA: '+now.format('YY-MM-DD HH:mm:ss'));
+    });
+
+</script>
+
+
+<div class="page-content">
+    <!--NAGLOWEK-->
+    <div class="mdl-grid mdl-grid--no-spacing">
+        <div class = "mdl-layout-spacer"></div>
+        <div id="headerInspection" class="mdl-cell mdl-cell--stretch mdl-cell--12-col-phone mdl-cell--10-col-desktop mdl-cell--12-col-tablet" style="text-align:center; font-weight: bold;">RAPORT PRACY BRAKARZA, LADOWANIE...</div>
+        <div class = "mdl-layout-spacer"></div>
+    </div>
+
+    </br>
+
+    <div class="mdl-grid mdl-grid--no-spacing">
+        <div class = "mdl-layout-spacer"></div>
+        <div id="inspectionContent" class="mdl-cell mdl-cell--stretch mdl-cell--12-col-phone mdl-cell--10-col-desktop mdl-cell--12-col-tablet ">
+            <!--<div class="mdl-cell mdl-cell&#45;&#45;stretch mdl-cell&#45;&#45;12-col-phone mdl-cell&#45;&#45;6-col-desktop mdl-cell&#45;&#45;12-col-tablet ">-->
+            <!--<p>Start Date: <input type = "text" id = "datepicker-13"></p>-->
+            <!--</div>-->
+            <!--<div class="mdl-cell mdl-cell&#45;&#45;stretch mdl-cell&#45;&#45;12-col-phone mdl-cell&#45;&#45;6-col-desktop mdl-cell&#45;&#45;12-col-tablet ">-->
+            <!--<p>Finish Date: <input type = "text" id = "datepicker-12"></p>-->
+            <!--</div>-->
+            <!--<div id="p2" class="mdl-progress mdl-js-progress mdl-progress__indeterminate" style="width:100%;"></div>-->
+            <table  class="mdl-data-table mdl-js-data-table mdl-shadow--2dp" >
+                <thead>
+                <tr>
+                    <th style="width: 200px;">BRAKARZ</th>
+                    <th>ID</th>
+                    <th>BARCODE</th>
+                    <th>DISP</th>
+                    <th>START</th>
+                    <th>KONIEC</th>
+                    <th>CZAS</th>
+                </tr>
+                </thead>
+                <tbody id ="inspectorsTab" style="padding: 0px;">
+
+                </tbody>
+            </table>
+        </div>
+        <div class = "mdl-layout-spacer"></div>
+    </div>
+</div>
