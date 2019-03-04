@@ -154,7 +154,37 @@
     }
 }
 
+//UPDATE 04.03.2019 - rozdział H100/WBR/TOTAL
+{
+    if(isset($_GET['h100']) or isset($_GET['wbr']))
+    {
 
+        if($_GET['h100'] == 0 and $_GET['wbr'] == 1)
+        {
+            $areaQuery = " and press not like 'V%' and press not like 'U%' ";
+            $areaQueryRepair=" and prscav not like 'V%' and prscav not like 'U%' ";
+        }
+
+        else if($_GET['h100'] == 1 and $_GET['wbr'] == 0)
+        {
+            $areaQuery = " and (press  like 'V%' or press like 'U%') ";
+            $areaQueryRepair=" and (prscav  like 'V%' or prscav like 'U%') ";
+        }
+
+        else
+        {
+            $areaQuery='';
+            $areaQueryRepair='';
+        }
+
+    }
+    else
+    {
+        $areaQuery='';
+        $areaQueryRepair='';
+    }
+
+}
 
         $scrapsSummary=array('BUILDING' => array('qty' =>0, 'color' =>'#f8fc00') , 'UNI' => array('qty' =>0, 'color' =>'#ef8904'), 'CURING' => array('qty' =>0, 'color' =>'#ef0404'));
         $dataArray=array();
@@ -186,7 +216,7 @@
                                         end maszyna
                                         from df_entry@plda5l2 left join df_defect_desc@plda5l2 on df_defect_desc.defect_num=df_entry.defect_num 
                                         where df_entry.defect_type='C' and df_defect_desc.defect_type='C' and disposition in (1) 
-                                        and update_date between to_date('".$start." ".$start_hr.":00:00','yy-mm-dd hh24:mi:ss') and to_date('".$end." ".$end_hr.":00:00','yy-mm-dd hh24:mi:ss') 
+                                        and update_date between to_date('".$start." ".$start_hr.":00:00','yy-mm-dd hh24:mi:ss') and to_date('".$end." ".$end_hr.":00:00','yy-mm-dd hh24:mi:ss') ".$areaQuery." ".$areaQuery."
                                         )
                                 )
                                 group by defect_num, long_desc order by sum(per_machine) desc");
@@ -226,7 +256,7 @@
                                                               from df_entry_history@plda5l2 left join df_defect_desc@plda5l2 on df_defect_desc.defect_num=df_entry_history.defect_num 
                                                               left join barcode@sbs on df_entry_history.barcode=barcode.barcode
                                                               where df_entry_history.defect_type='C' and df_defect_desc.defect_type='C' and disposition in (6) 
-                                                              and transaction_date between to_date('".$start." ".$start_hr.":00:00','yy-mm-dd hh24:mi:ss') and to_date('".$end." ".$end_hr.":00:00','yy-mm-dd hh24:mi:ss')   and transaction_type='INS'
+                                                              and transaction_date between to_date('".$start." ".$start_hr.":00:00','yy-mm-dd hh24:mi:ss') and to_date('".$end." ".$end_hr.":00:00','yy-mm-dd hh24:mi:ss')   and transaction_type='INS' ".$areaQueryRepair."
                                                           )
                                                         )group by defect_num, long_desc order by sum(per_machine) desc");
                 oci_execute($stid);

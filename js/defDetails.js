@@ -136,11 +136,13 @@ var machineChartData;
 
 var urlParams = new URLSearchParams(window.location.search);
 var defectCode = urlParams.get('defect');
+var h100= urlParams.get('h100');
+var wbr= urlParams.get('wbr');
 var chart;
 var codeChart;
 
 $(document).ready(function() {
-    $.getJSON('../php/getDefectDetails.php?defect=' + defectCode, function (data) {
+    $.getJSON('../php/getDefectDetails.php?defect=' + defectCode+'&h100='+h100+'&wbr='+wbr, function (data) {
         // alert(data[1].qty);
         //alert('x');
         historyChartData = data.CHART;
@@ -149,7 +151,7 @@ $(document).ready(function() {
         historyChart();
     });
 
-    $.get('../php/getDefectDetails.php?defect=' + defectCode+'&mode=1', function (data) {
+    $.get('../php/getDefectDetails.php?defect=' + defectCode+'&h100='+h100+'&wbr='+wbr+'&mode=1', function (data) {
          $('#list').html(data);
         //alert(historyChartData[12].desc);
     });

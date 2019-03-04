@@ -23,6 +23,10 @@ var scrapInterval;
 var scrapChartRefreshMode=0; // DOMYŚLNIE DANE W WYKRESIE PREZENTUJĄ BIEŻĄCĄ DOBĘ
 var scrapChartAutoUpdate = 1; //AUTOMATYCZNA AKTUALIZACJA
 
+//update 4.03.2019 rozdzielenie H100 + WBR
+var h100=1;
+var wbr=1;
+
 //AKCJE DO PODWÓJNEGO/POJEDYNCZEGO KLIKNIECIA NA GLOWNY WYKRES
 {
     AmCharts.doSingleClick = function (event) {
@@ -31,7 +35,7 @@ var scrapChartAutoUpdate = 1; //AUTOMATYCZNA AKTUALIZACJA
 
     AmCharts.doDoubleClick = function (event) {
        // alert(event.item.dataContext.defectNumber);
-        window.open('http://172.22.8.102/ff/dashboard/subpages/defectDetails.html?defect='+event.item.dataContext.defectNumber,'XXX', "width=600,height=800,left=550,top=250");
+        window.open('http://172.22.8.102/ff/dashboard/subpages/defectDetails.html?defect='+event.item.dataContext.defectNumber+'&h100='+h100+'&wbr='+wbr,'XXX', "width=600,height=800,left=550,top=250");
     }
 
     // create click handler
@@ -116,6 +120,11 @@ function mainTableFill()
         $('#inspection').html("<span class='mdl-layout--large-screen-only'>"+data.MAIN_TABLE.INSPECTION_OUTPUT+" /</span> "+data.MAIN_TABLE.INSPECTION_FORECAST+"<br><span style='font-size: 80%'>("+(data.MAIN_TABLE.INSPECTION_FORECAST-data.MAIN_TABLE.CURING_PRED)+")</span>");
         $('#fvm').html("<span class='mdl-layout--large-screen-only'>"+data.MAIN_TABLE.FVM_OUTPUT+" /</span> "+data.MAIN_TABLE.FVM_FORECAST+"<br><span style='font-size: 80%'>("+(data.MAIN_TABLE.FVM_FORECAST-data.MAIN_TABLE.CURING_PRED)+")</span>");
         $('#stock').html("<span class=''>"+data.MAIN_TABLE.STOCK+"<br><span style='font-size: 80%'>("+(data.MAIN_TABLE.STOCK-data.MAIN_TABLE.LABO)+")</span>");
+
+        $('#curingTooltip').html('H100:</br>'+data.MAIN_TABLE.H100_CUR_OUTPUT+' / '+data.MAIN_TABLE.H100_CUR_PRED);
+        $('#inspectionTooltip').html('H100:</br>'+data.MAIN_TABLE.H100_FF_OUTPUT+' / '+data.MAIN_TABLE.H100_FF_PRED);
+        $('#fvmTooltip').html('H100:</br>'+data.MAIN_TABLE.H100_FVM+' / '+data.MAIN_TABLE.H100_FVM_PRED);
+        $('#stockTooltip').html('PLAN ZDANIA: '+data.MAIN_TABLE.PLAN_GP3);
 
         if((data.MAIN_TABLE.CURING_PRED-shiftPlan>0))
             $('#curing').removeClass().addClass('positiveCell');
@@ -306,7 +315,7 @@ function fvmPerf()
 
 function scrapsShift()
 {
-    $.getJSON('php/getScraps.php?mode='+scrapChartRefreshMode, function(data)
+    $.getJSON('php/getScraps.php?mode='+scrapChartRefreshMode+'&h100='+h100+'&wbr='+wbr, function(data)
     {
         var autoUpdateText='<span style="color: #1b7a00; text-underline-style: wave; ">AUTOUPDATE ON</span>';
         chartData=data.DANE;

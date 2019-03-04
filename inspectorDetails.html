@@ -17,7 +17,8 @@
     //var duration = moment.duration(now.diff(startDtime)).as('minutes')+10;
 
     $('#inspectorsTab').html('');
-        $.getJSON('http://localhost/node?inspector='+insp, function(data) {
+  //  alert('j');
+        $.getJSON('localhost/node/inspector='+insp, function(data) {
         for(var i=0; i< data.length; i++)
         {
             //adr = 'inspectorDetails.html?inspector='+data[i].czasPrzerw;

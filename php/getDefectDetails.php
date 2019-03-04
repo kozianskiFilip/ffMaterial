@@ -8,7 +8,36 @@
 error_reporting(0);
 $ffmes_connection = oci_connect('minimes_ff_wbr', 'Baza0racl3appl1cs', '172.22.8.47/ORA');
 
+//UPDATE 04.03.2019 - rozdział H100/WBR/TOTAL
+{
+    if(isset($_GET['h100']) or isset($_GET['wbr']))
+    {
 
+        if($_GET['h100'] == 0 and $_GET['wbr'] == 1)
+        {
+            $areaQuery = " and press not like 'V%' and press not like 'U%' ";
+            $areaQueryRepair=" and prscav not like 'V%' and prscav not like 'U%' ";
+        }
+
+        else if($_GET['h100'] == 1 and $_GET['wbr'] == 0)
+        {
+            $areaQuery = " and (press  like 'V%' or press like 'U%') ";
+            $areaQueryRepair=" and (prscav  like 'V%' or prscav like 'U%') ";
+        }
+
+        else
+        {
+            $areaQuery='';
+            $areaQueryRepair='';
+        }
+
+    }
+    else
+    {
+        $areaQuery='';
+        $areaQueryRepair='';
+    }
+}
 
 
 
@@ -25,7 +54,7 @@ if(isset($_GET['mode']))
                                   from df_entry@plda5l2
                                   left join df_defect_desc@plda5l2 on df_defect_desc.defect_num=df_entry.defect_num
                                   where df_entry.defect_type='C' and df_defect_desc.defect_type='C' and disposition=1 and df_entry.defect_num=" . $_GET['defect'] . " and update_date between
-                                  to_date(to_char(sysdate,'yy-mm-dd') || ' 06:00:00','yy-mm-dd hh24:mi:ss') and to_date(to_char(sysdate+1,'yy-mm-dd') || ' 06:00:00','yy-mm-dd hh24:mi:ss')
+                                  to_date(to_char(sysdate,'yy-mm-dd') || ' 06:00:00','yy-mm-dd hh24:mi:ss') and to_date(to_char(sysdate+1,'yy-mm-dd') || ' 06:00:00','yy-mm-dd hh24:mi:ss') ".$areaQuery."
                                   ) 
                                   order by il desc, long_desc, tire_code");
 
@@ -116,7 +145,7 @@ else{
                                                 from df_entry@plda5l2 left join df_defect_desc@plda5l2 on df_defect_desc.defect_num=df_entry.defect_num 
                                                 where df_entry.defect_type='C' and df_defect_desc.defect_type='C' and disposition in (1) 
                                                 and df_entry.defect_num=".$_GET['defect']."
-                                                and update_date between to_date(to_char(sysdate - 91,'yy-mm-dd') || ' 06:00:00','yy-mm-dd hh24:mi:ss') and to_date(to_char(sysdate+1,'yy-mm-dd') || ' 06:00:00','yy-mm-dd hh24:mi:ss') 
+                                                and update_date between to_date(to_char(sysdate - 91,'yy-mm-dd') || ' 06:00:00','yy-mm-dd hh24:mi:ss') and to_date(to_char(sysdate+1,'yy-mm-dd') || ' 06:00:00','yy-mm-dd hh24:mi:ss') ".$areaQuery."
                                                 ) order by dzien");
     oci_execute($stid);
     $i=0;

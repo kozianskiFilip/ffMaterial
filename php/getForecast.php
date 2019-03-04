@@ -72,7 +72,7 @@ if($h>=22 || $h<6)
 
 $stid = oci_parse($ffmes_connection,"select dstamp,pred,output,prod,inv_ok,inv_nok,bc3_output,bc3_pred,klasowanie,klasowanie_pred, fvm,fvm_pred,sort1,sort2, trimmers, 
                                             PLAN_EXCEL_1, PLAN_EXCEL_2, PLAN_EXCEL_3, PLAN_EXCEL_TOTAL,
-                                            SKU, CT_DOBA,GT_DOBA, PLAN_GP3, ZDANIE, REPLACEMENT,OE,LABO from
+                                            SKU, CT_DOBA,GT_DOBA, PLAN_GP3, ZDANIE, REPLACEMENT,OE,LABO, h100_cur_output,h100_cur_pred,h100_ff_output,h100_ff_pred,h100_fvm,h100_fvm_pred from
                                             (
                                                 select * from cur_pred where dstamp>sysdate-1/24 order by dstamp desc
                                             ) 
@@ -118,6 +118,13 @@ while ($row = oci_fetch_array($stid, OCI_BOTH))
     $dataArray['MAIN_TABLE']['REPLACEMENT']=$row[24];
     $dataArray['MAIN_TABLE']['OE']=$row[25];
     $dataArray['MAIN_TABLE']['LABO']=$row[26];
+    $dataArray['MAIN_TABLE']['H100_CUR_OUTPUT']=$row[27];
+    $dataArray['MAIN_TABLE']['H100_CUR_PRED']=$row[28];
+    $dataArray['MAIN_TABLE']['H100_FF_OUTPUT']=$row[29];
+    $dataArray['MAIN_TABLE']['H100_FF_PRED']=$row[30];
+    $dataArray['MAIN_TABLE']['H100_FVM']=$row[31];
+    $dataArray['MAIN_TABLE']['H100_FVM_PRED']=$row[32];
+
 }
 
 $stid = oci_parse($ffmes_connection,"select to_char(dstamp,'hh24:mi'), pred, klasowanie_pred, fvm_pred from cur_pred where dstamp
