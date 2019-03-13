@@ -89,12 +89,66 @@
                         </table>
 
                         <!--MAIN TABLE TOOLTIPS-->
+                        <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;font-size:100%;"
+                             for="building" id="buildingTooltip"></div>
+                        <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;font-size:100%;"
+                             for="inventory" id="inventoryTooltip"></div>
+
                         <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;font-size:100%;" for="curing" id="curingTooltip"></div>
                         <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;font-size:100%;" for="inspection" id="inspectionTooltip"></div>
                         <div class="mdl-tooltip" style="white-space: nowrap;max-width:none; font-size:100%;" for="fvm" id="fvmTooltip"></div>
                         <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;font-size:100%;" for="stock" id="stockTooltip">ss</div>
                     </div>
                     <div class = "mdl-layout-spacer"></div>
+                </div>
+
+                <!--TABELA DANYCH PREP -->
+                <div class="mdl-grid mdl-grid--no-spacing">
+                    <div class="mdl-layout-spacer"></div>
+                    <div class="mdl-cell mdl-cell--stretch mdl-cell--12-col-phone mdl-cell--10-col-desktop mdl-cell--12-col-tablet ">
+                        <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp" id="prepInventory"
+                               style="display: none;">
+                            <thead>
+                            <tr>
+                                <th>BOK</th>
+                                <th>BIEŻNIK</th>
+                                <th>OPAS.</th>
+                                <th>KAPA</th>
+                                <th>DRUT.</th>
+                                <th>OSNOWA.</th>
+                                <th>EKRAN</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td id="sidewallsInv"></td>
+                                <td id="treadsInv"></td>
+                                <td id="breakersInv"></td>
+                                <td id="linersInv"></td>
+                                <td id="beadsInv"></td>
+                                <td id="plysInv"></td>
+                                <td id="olaysInv"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;font-size:100%;"
+                             for="sidewallsInv" id="sidewallsTooltip"></div>
+                        <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;font-size:100%;"
+                             for="treadsInv" id="treadsTooltip">AAA
+                        </div>
+                        <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;font-size:100%;"
+                             for="breakersInv" id="breakersTooltip"></div>
+                        <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;font-size:100%;"
+                             for="linersInv" id="linersTooltip"></div>
+                        <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;font-size:100%;"
+                             for="beadsInv" id="beadsTooltip"></div>
+                        <div class="mdl-tooltip" style="white-space: nowrap;max-width:none; font-size:100%;"
+                             for="plysInv" id="plysTooltip"></div>
+                        <div class="mdl-tooltip" style="white-space: nowrap;max-width:none;font-size:100%;"
+                             for="olaysInv" id="olaysTooltip">ss
+                        </div>
+                    </div>
+                    <div class="mdl-layout-spacer"></div>
                 </div>
                 <br>
 
@@ -118,6 +172,10 @@
                         </button>
                           <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect" style="background-color: #4e342e" onclick="$('#backupCharts').slideToggle()">
                             BACKUP
+                        </button>
+                        <button onclick="$('#prepInventory').toggle();"
+                                class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect"
+                                style="background-color: #00acc1">PREP INV
                         </button>
                     </div>
                     <div class = "mdl-layout-spacer"></div>
@@ -185,7 +243,7 @@
                 <div class="mdl-grid mdl-grid--no-spacing">
                     <div class = "mdl-layout-spacer"></div>
                     <div class="mdl-cell mdl-cell--stretch mdl-cell--12-col-phone mdl-cell--10-col-desktop mdl-cell--12-col-tablet" style="overflow-x:auto">
-                        <table  class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+                        <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp" id="fvmTable">
                             <thead>
                             <tr>
                                 <th>FVM02</th>

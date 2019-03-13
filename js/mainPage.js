@@ -126,6 +126,12 @@ function mainTableFill()
         $('#fvmTooltip').html('H100:</br>'+data.MAIN_TABLE.H100_FVM+' / '+data.MAIN_TABLE.H100_FVM_PRED);
         $('#stockTooltip').html('PLAN ZDANIA: '+data.MAIN_TABLE.PLAN_GP3);
 
+        $('#buildingTooltip').html('KRUPP: ' + data.MAIN_TABLE.KRUPP_OUTPUT + ' / ' + data.MAIN_TABLE.KRUPP_PRED + '</br>' + 'PLT: ' + data.MAIN_TABLE.PLT_OUTPUT + ' / ' + data.MAIN_TABLE.PLT_PRED + '</br>' + 'TRAD: ' + data.MAIN_TABLE.TRAD_OUTPUT + ' / ' + data.MAIN_TABLE.TRAD_PRED);
+        $('#inventoryTooltip').html('KRUPP: ' + data.MAIN_TABLE.KRUPP_INV_OK + '(' + data.MAIN_TABLE.KRUPP_INV_NOK + ')</br>'
+            + 'PLT: ' + data.MAIN_TABLE.PLT_INV_OK + '(' + data.MAIN_TABLE.PLT_INV_NOK + ')</br>'
+            + 'TRAD: ' + data.MAIN_TABLE.TRAD_INV_OK + '(' + data.MAIN_TABLE.TRAD_INV_NOK + ')');
+
+
         if((data.MAIN_TABLE.CURING_PRED-shiftPlan>0))
             $('#curing').removeClass().addClass('positiveCell');
 
@@ -147,6 +153,237 @@ function mainTableFill()
         else
             $('#inspection').removeClass().addClass('negativeCell');
 
+
+        //PREPARATION DATA
+        var sidewalls = new Array("SV");
+        var treads = new Array('SV');
+        var breakers = new Array('SV');
+        var beads = new Array('SV');
+        var plys = new Array('SV');
+        var olays = new Array('SV');
+
+        var sidewallsOkQty = 0;
+        var sidewallsNokQty = 0;
+        var sidewallsOkQtyPcs = 0;
+        var sidewallsNokQtyPcs = 0;
+        var sidewallsOkHalfs = 0;
+        var sidewallsOkAged = 0;
+
+        var treadsOkQty = 0;
+        var treadsNokQty = 0;
+        var treadsOkQtyPcs = 0;
+        var treadsNokQtyPcs = 0;
+        var treadsOkHalfs = 0;
+        var treadsOkAged = 0;
+
+        var breakersOkQty = 0;
+        var breakersNokQty = 0;
+        var breakersOkQtyPcs = 0;
+        var breakersNokQtyPcs = 0;
+        var breakersOkHalfs = 0;
+        var breakersOkAged = 0;
+
+        var beadsOkQty = 0;
+        var beadsNokQty = 0;
+        var beadsOkQtyPcs = 0;
+        var beadsNokQtyPcs = 0;
+        var beadsOkHalfs = 0;
+        var beadsOkAged = 0;
+
+        var plysOkQty = 0;
+        var plysNokQty = 0;
+        var plysOkQtyPcs = 0;
+        var plysNokQtyPcs = 0;
+        var plysOkHalfs = 0;
+        var plysOkAged = 0;
+
+        var olaysOkQty = 0;
+        var olaysNokQty = 0;
+        var olaysOkQtyPcs = 0;
+        var olaysNokQtyPcs = 0;
+        var olaysOkHalfs = 0;
+        var olaysOkAged = 0;
+
+        var linersOkQty = 0;
+        var linersNokQty = 0;
+        var linersOkQtyPcs = 0;
+        var linersNokQtyPcs = 0;
+        var linersOkHalfs = 0;
+        var linersOkAged = 0;
+
+        var sidewallsTooltip = '';
+        var treadsTooltip = '';
+        var breakersTooltip = '';
+        var beadsTooltip = '';
+        var plysTooltip = '';
+        var olaysTooltip = '';
+        var linersTooltip = '';
+
+        // alert(data.PREP.length);
+        for (var cntr = 0; cntr < data.PREP.length; cntr++) {
+            //BOKI
+            if (data.PREP[cntr].ELEMENT == 'SV') {
+                //alert('x');
+                sidewallsOkQty += data.PREP[cntr].OK_QTY;
+                sidewallsNokQty += data.PREP[cntr].NOK_QTY;
+                sidewallsOkQtyPcs += data.PREP[cntr].OK_QTY_PCS;
+                sidewallsNokQtyPcs += data.PREP[cntr].NOK_QTY_PCS;
+                sidewallsOkHalfs += data.PREP[cntr].OK_HALF;
+                sidewallsOkAged += data.PREP[cntr].OK_AGED;
+
+                sidewallsTooltip += data.PREP[cntr].ELEMENT + ': ' + data.PREP[cntr].OK_QTY + ' (<span style="color: red;">' + data.PREP[cntr].NOK_QTY + '</span>)  ' + data.PREP[cntr].OK_QTY_PCS + '/<span style="color: red;">' + data.PREP[cntr].NOK_QTY_PCS + '</span>  <span style="color: yellow;">H:' + data.PREP[cntr].OK_HALF + '</span>  <span style="color:greenyellow;">A:' + data.PREP[cntr].OK_AGED + '</span> </br>';
+            }
+
+            //BIEZNIKI
+            if (data.PREP[cntr].ELEMENT == 'TB' || data.PREP[cntr].ELEMENT == 'TL' || data.PREP[cntr].ELEMENT == 'TA') {
+                //alert('x');
+                treadsOkQty += data.PREP[cntr].OK_QTY;
+                treadsNokQty += data.PREP[cntr].NOK_QTY;
+                treadsOkQtyPcs += data.PREP[cntr].OK_QTY_PCS;
+                treadsNokQtyPcs += data.PREP[cntr].NOK_QTY_PCS;
+                treadsOkHalfs += data.PREP[cntr].OK_HALF;
+                treadsOkAged += data.PREP[cntr].OK_AGED;
+
+                treadsTooltip += data.PREP[cntr].ELEMENT + ': ' + data.PREP[cntr].OK_QTY + ' (<span style="color: red;">' + data.PREP[cntr].NOK_QTY + '</span>)  ' + data.PREP[cntr].OK_QTY_PCS + '/<span style="color: red;">' + data.PREP[cntr].NOK_QTY_PCS + '</span>  <span style="color: yellow;">H:' + data.PREP[cntr].OK_HALF + '</span>  <span style="color:greenyellow;">A:' + data.PREP[cntr].OK_AGED + '</span> </br>';
+            }
+
+            if (data.PREP[cntr].ELEMENT == 'BR' || data.PREP[cntr].ELEMENT == 'BL') {
+                //alert('x');
+                breakersOkQty += data.PREP[cntr].OK_QTY;
+                breakersNokQty += data.PREP[cntr].NOK_QTY;
+                breakersOkQtyPcs += data.PREP[cntr].OK_QTY_PCS;
+                breakersNokQtyPcs += data.PREP[cntr].NOK_QTY_PCS;
+                breakersOkHalfs += data.PREP[cntr].OK_HALF;
+                breakersOkAged += data.PREP[cntr].OK_AGED;
+                breakersTooltip += data.PREP[cntr].ELEMENT + ': ' + data.PREP[cntr].OK_QTY + ' (<span style="color: red;">' + data.PREP[cntr].NOK_QTY + '</span>)  ' + data.PREP[cntr].OK_QTY_PCS + '/<span style="color: red;">' + data.PREP[cntr].NOK_QTY_PCS + '</span>  <span style="color: yellow;">H:' + data.PREP[cntr].OK_HALF + '</span>  <span style="color:greenyellow;">A:' + data.PREP[cntr].OK_AGED + '</span> </br>';
+            }
+
+            //DRUTÓWKI
+            if (data.PREP[cntr].ELEMENT == 'BS' || data.PREP[cntr].ELEMENT == 'BM') {
+                //alert('x');
+                beadsOkQty += data.PREP[cntr].OK_QTY;
+                beadsNokQty += data.PREP[cntr].NOK_QTY;
+                beadsOkQtyPcs += data.PREP[cntr].OK_QTY_PCS;
+                beadsNokQtyPcs += data.PREP[cntr].NOK_QTY_PCS;
+                beadsOkHalfs += data.PREP[cntr].OK_HALF;
+                beadsOkAged += data.PREP[cntr].OK_AGED;
+
+                beadsTooltip += data.PREP[cntr].ELEMENT + ': ' + data.PREP[cntr].OK_QTY + ' (<span style="color: red;">' + data.PREP[cntr].NOK_QTY + '</span>)  ' + data.PREP[cntr].OK_QTY_PCS + '/<span style="color: red;">' + data.PREP[cntr].NOK_QTY_PCS + '</span>  <span style="color: yellow;">H:' + data.PREP[cntr].OK_HALF + '</span>  <span style="color:greenyellow;">A:' + data.PREP[cntr].OK_AGED + '</span> </br>';
+            }
+
+            //OSNOWA
+            if (data.PREP[cntr].ELEMENT == 'PA' || data.PREP[cntr].ELEMENT == 'PL' || data.PREP[cntr].ELEMENT == 'WL') {
+                //alert('x');
+                plysOkQty += data.PREP[cntr].OK_QTY;
+                plysNokQty += data.PREP[cntr].NOK_QTY;
+                plysOkQtyPcs += data.PREP[cntr].OK_QTY_PCS;
+                plysNokQtyPcs += data.PREP[cntr].NOK_QTY_PCS;
+                plysOkHalfs += data.PREP[cntr].OK_HALF;
+                plysOkAged += data.PREP[cntr].OK_AGED;
+                plysTooltip += data.PREP[cntr].ELEMENT + ': ' + data.PREP[cntr].OK_QTY + ' (<span style="color: red;">' + data.PREP[cntr].NOK_QTY + '</span>)  ' + data.PREP[cntr].OK_QTY_PCS + '/<span style="color: red;">' + data.PREP[cntr].NOK_QTY_PCS + '</span>  <span style="color: yellow;">H:' + data.PREP[cntr].OK_HALF + '</span>  <span style="color:greenyellow;">A:' + data.PREP[cntr].OK_AGED + '</span> </br>';
+            }
+
+            //KAPA
+            if (data.PREP[cntr].ELEMENT == 'LN') {
+                //alert('x');
+                linersOkQty += data.PREP[cntr].OK_QTY;
+                linersNokQty += data.PREP[cntr].NOK_QTY;
+                linersOkQtyPcs += data.PREP[cntr].OK_QTY_PCS;
+                linersNokQtyPcs += data.PREP[cntr].NOK_QTY_PCS;
+                linersOkHalfs += data.PREP[cntr].OK_HALF;
+                linersOkAged += data.PREP[cntr].OK_AGED;
+                linersTooltip += data.PREP[cntr].ELEMENT + ': ' + data.PREP[cntr].OK_QTY + ' (<span style="color: red;">' + data.PREP[cntr].NOK_QTY + '</span>)  ' + data.PREP[cntr].OK_QTY_PCS + '/<span style="color: red;">' + data.PREP[cntr].NOK_QTY_PCS + '</span>  <span style="color: yellow;">H:' + data.PREP[cntr].OK_HALF + '</span>  <span style="color:greenyellow;">A:' + data.PREP[cntr].OK_AGED + '</span> </br>';
+            }
+
+
+            //EKRAN
+            if (data.PREP[cntr].ELEMENT == 'SA') {
+                //alert('x');
+                olaysOkQty += data.PREP[cntr].OK_QTY;
+                olaysNokQty += data.PREP[cntr].NOK_QTY;
+                olaysOkQtyPcs += data.PREP[cntr].OK_QTY_PCS;
+                olaysNokQtyPcs += data.PREP[cntr].NOK_QTY_PCS;
+                olaysOkHalfs += data.PREP[cntr].OK_HALF;
+                olaysOkAged += data.PREP[cntr].OK_AGED;
+                olaysTooltip += data.PREP[cntr].ELEMENT + ': ' + data.PREP[cntr].OK_QTY + ' (<span style="color: red;">' + data.PREP[cntr].NOK_QTY + '</span>)  ' + data.PREP[cntr].OK_QTY_PCS + '/<span style="color: red;">' + data.PREP[cntr].NOK_QTY_PCS + '</span>  <span style="color: yellow;">H:' + data.PREP[cntr].OK_HALF + '</span>  <span style="color:greenyellow;">A:' + data.PREP[cntr].OK_AGED + '</span> </br>';
+            }
+
+        }
+
+
+        $('#sidewallsInv').html(sidewallsOkQty.toFixed(0) + '</br><span style="font-size: 80%">(' + sidewallsNokQty.toFixed(0) + ')</span>');
+        $('#sidewallsTooltip').html(sidewallsTooltip);
+
+        $('#treadsInv').html(treadsOkQty.toFixed(0) + '</br><span style="font-size: 80%">(' + treadsNokQty.toFixed(0) + ')</span>');
+        $('#treadsTooltip').html(treadsTooltip);
+
+        $('#breakersInv').html(breakersOkQty.toFixed(0) + '</br><span style="font-size: 80%">(' + breakersNokQty.toFixed(0) + ')</span>');
+        $('#breakersTooltip').html(breakersTooltip);
+
+        $('#beadsInv').html(beadsOkQty.toFixed(0) + '</br><span style="font-size: 80%">(' + beadsNokQty.toFixed(0) + ')</span>');
+        $('#beadsTooltip').html(beadsTooltip);
+
+        $('#plysInv').html(plysOkQty.toFixed(0) + '</br><span style="font-size: 80%">(' + plysNokQty.toFixed(0) + ')</span>');
+        $('#plysTooltip').html(plysTooltip);
+
+        $('#linersInv').html(linersOkQty.toFixed(0) + '</br><span style="font-size: 80%">(' + linersNokQty.toFixed(0) + ')</span>');
+        $('#linersTooltip').html(linersTooltip);
+
+        $('#olaysInv').html(olaysOkQty.toFixed(0) + '</br><span style="font-size: 80%">(' + olaysNokQty.toFixed(0) + ')</span>');
+        $('#olaysTooltip').html(olaysTooltip);
+
+        if ((sidewallsOkQty > 72000))
+            $('#sidewallsInv').removeClass().addClass('positiveCell');
+        else if (sidewallsOkQty > 65000)
+            $('#sidewallsInv').removeClass().addClass('neutralCell');
+        else
+            $('#sidewallsInv').removeClass().addClass('negativeCell');
+
+        if ((treadsOkQty > 30000))
+            $('#treadsInv').removeClass().addClass('positiveCell');
+        else if (treadsOkQty > 27000)
+            $('#treadsInv').removeClass().addClass('neutralCell');
+        else
+            $('#treadsInv').removeClass().addClass('negativeCell');
+
+        if ((breakersOkQty > 83000))
+            $('#breakersInv').removeClass().addClass('positiveCell');
+        else if (breakersOkQty > 75000)
+            $('#breakersInv').removeClass().addClass('neutralCell');
+        else
+            $('#breakersInv').removeClass().addClass('negativeCell');
+
+        if ((beadsOkQty > 36000))
+            $('#beadsInv').removeClass().addClass('positiveCell');
+        else if (beadsOkQty > 30000)
+            $('#beadsInv').removeClass().addClass('neutralCell');
+        else
+            $('#beadsInv').removeClass().addClass('negativeCell');
+
+        if ((linersOkQtyPcs > 150))
+            $('#linersInv').removeClass().addClass('positiveCell');
+        else if (linersOkQtyPcs > 120)
+            $('#linersInv').removeClass().addClass('neutralCell');
+        else
+            $('#linersInv').removeClass().addClass('negativeCell');
+
+        if ((plysOkQtyPcs > 260))
+            $('#plysInv').removeClass().addClass('positiveCell');
+        else if (plysOkQtyPcs > 230)
+            $('#plysInv').removeClass().addClass('neutralCell');
+        else
+            $('#plysInv').removeClass().addClass('negativeCell');
+
+
+        // var sidewallOk=data.PREP.SV.OK_QTY + (typeof data.PREP.SX.OK_QTY != undefined ? data.PREP.SX.OK_QTY : 0) ;
+        //alert(data.PREP.SX.OK_QTY);
+        //$('#sidewallsInv').html('x');
+        // alert('x');
+
+        // $('#sidewallsInv').html(data.PREP[0].ELEMENT);
+
+        var sidewallNok = 0;
+        var sidewallOkQty = 0;
 
         // inspectionChartData=data.MAIN_TABLE.SUPPORT_CHARTS.INSPECTION;
         // inspectionChart();

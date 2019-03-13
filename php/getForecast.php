@@ -72,7 +72,7 @@ if($h>=22 || $h<6)
 
 $stid = oci_parse($ffmes_connection,"select dstamp,pred,output,prod,inv_ok,inv_nok,bc3_output,bc3_pred,klasowanie,klasowanie_pred, fvm,fvm_pred,sort1,sort2, trimmers, 
                                             PLAN_EXCEL_1, PLAN_EXCEL_2, PLAN_EXCEL_3, PLAN_EXCEL_TOTAL,
-                                            SKU, CT_DOBA,GT_DOBA, PLAN_GP3, ZDANIE, REPLACEMENT,OE,LABO, h100_cur_output,h100_cur_pred,h100_ff_output,h100_ff_pred,h100_fvm,h100_fvm_pred from
+                                            SKU, CT_DOBA,GT_DOBA, PLAN_GP3, ZDANIE, REPLACEMENT,OE,LABO, h100_cur_output,h100_cur_pred,h100_ff_output,h100_ff_pred,h100_fvm,h100_fvm_pred,krupp_output,plt_output,trad_output,krupp_inv,plt_inv,trad_inv,krup_nok_inv,plt_nok_inv,trad_nok_inv,krupp_pred,plt_pred,trad_pred from
                                             (
                                                 select * from cur_pred where dstamp>sysdate-1/24 order by dstamp desc
                                             ) 
@@ -125,24 +125,55 @@ while ($row = oci_fetch_array($stid, OCI_BOTH))
     $dataArray['MAIN_TABLE']['H100_FVM']=$row[31];
     $dataArray['MAIN_TABLE']['H100_FVM_PRED']=$row[32];
 
+    $dataArray['MAIN_TABLE']['KRUPP_OUTPUT'] = $row[33];
+    $dataArray['MAIN_TABLE']['PLT_OUTPUT'] = $row[34];
+    $dataArray['MAIN_TABLE']['TRAD_OUTPUT'] = $row[35];
+
+    $dataArray['MAIN_TABLE']['KRUPP_INV_OK'] = $row[36];
+    $dataArray['MAIN_TABLE']['PLT_INV_OK'] = $row[37];
+    $dataArray['MAIN_TABLE']['TRAD_INV_OK'] = $row[38];
+
+    $dataArray['MAIN_TABLE']['KRUPP_INV_NOK'] = $row[39];
+    $dataArray['MAIN_TABLE']['PLT_INV_NOK'] = $row[40];
+    $dataArray['MAIN_TABLE']['TRAD_INV_NOK'] = $row[41];
+
+    $dataArray['MAIN_TABLE']['KRUPP_PRED'] = $row[42];
+    $dataArray['MAIN_TABLE']['PLT_PRED'] = $row[43];
+    $dataArray['MAIN_TABLE']['TRAD_PRED'] = $row[44];
+
 }
 
-$stid = oci_parse($ffmes_connection,"select to_char(dstamp,'hh24:mi'), pred, klasowanie_pred, fvm_pred from cur_pred where dstamp
-                                            between 
-                                            to_date('".$start." ".$start_hr.":00:00','yy-mm-dd hh24:mi:ss') and to_date('".$end." ".$end_hr.":00:00','yy-mm-dd hh24:mi:ss')
-                                            order by dstamp");
+$stid = oci_parse($ffmes_connection, "select to_char(dstamp,'hh24:mi'), pred, klasowanie_pred, fvm_pred from cur_pred where dstamp
+                                                between 
+                                                to_date('" . $start . " " . $start_hr . ":00:00','yy-mm-dd hh24:mi:ss') and to_date('" . $end . " " . $end_hr . ":00:00','yy-mm-dd hh24:mi:ss')
+                                                order by dstamp");
 oci_execute($stid);
 
-$inspectionArray=array();
-$curingArray=array();
-while ($row = oci_fetch_array($stid, OCI_BOTH))
-{
+$inspectionArray = array();
+$curingArray = array();
+while ($row = oci_fetch_array($stid, OCI_BOTH)) {
     //echo $row[0].'<br>';
-    array_push($inspectionArray,array('TIMESTAMP' => $row[0], 'PRED' => $row[2]));
-    array_push($curingArray,array('TIMESTAMP' => $row[0], 'PRED' => $row[1]));
+
+    //  $prepInventoryArray[$row[0]]=array('OK_QTY' => $row[1],'NOK_QTY' => $row[2],'OK_QTY_PCS' => $row[3],'NOK_QTY_PCS' => $row[4],'OK_HALF' => $row[5], 'OK_AGED' => $row[6]);
+    array_push($inspectionArray, array('TIMESTAMP' => $row[0], 'PRED' => $row[2]));
+    array_push($curingArray, array('TIMESTAMP' => $row[0], 'PRED' => $row[1]));
 }
-$dataArray['MAIN_TABLE']['SUPPORT_CHARTS']['INSPECTION']=$inspectionArray;
-$dataArray['MAIN_TABLE']['SUPPORT_CHARTS']['CURING']=$curingArray;
-echo json_encode($dataArray,JSON_NUMERIC_CHECK);
+
+//PROLAG INVENTORY
+$prepInventoryArray = array();
+$stid = oci_parse($ffmes_connection, "select 
+                                                    mat_group, sum(case when qa_attr=1 then qty else 0 end) OK_QTY,sum(case when qa_attr=0 then qty else 0 end) NOK_QTY, sum(case when qa_attr=1 then 1 else 0 end) OK_QTY_PCS, sum(case when qa_attr=0 then 1 else 0 end) NOK_QTY_PCS,
+                                                    sum(case when qa_attr=1 and qty<0.9*max_QTY then 1 else 0 end) OK_HALFS_PCS, sum(case when qa_attr=1 and sysdate>min_usage_date then 1 else 0 end) OK_AGED
+                                                    from prolag_prep_inv@prolag where prod_machine not like '%MRT%' and prod_machine !='QUADRO' and prod_machine !='FISHER' group by mat_group");
+oci_execute($stid);
+while ($row = oci_fetch_array($stid, OCI_BOTH)) {
+    array_push($prepInventoryArray, array('ELEMENT' => $row[0], 'OK_QTY' => $row[1], 'NOK_QTY' => $row[2], 'OK_QTY_PCS' => $row[3], 'NOK_QTY_PCS' => $row[4], 'OK_HALF' => $row[5], 'OK_AGED' => $row[6]));
+    // $prepInventoryArray[$row[0]]=array('OK_QTY' => $row[1],'NOK_QTY' => $row[2],'OK_QTY_PCS' => $row[3],'NOK_QTY_PCS' => $row[4],'OK_HALF' => $row[5], 'OK_AGED' => $row[6]);
+}
+
+$dataArray['PREP'] = $prepInventoryArray;
+$dataArray['MAIN_TABLE']['SUPPORT_CHARTS']['INSPECTION'] = $inspectionArray;
+$dataArray['MAIN_TABLE']['SUPPORT_CHARTS']['CURING'] = $curingArray;
+echo json_encode($dataArray, JSON_NUMERIC_CHECK);
 oci_close($ffmes_connection);
 ?>

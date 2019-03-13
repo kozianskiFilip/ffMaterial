@@ -2,16 +2,13 @@
 <project version="4">
   <component name="WebServers">
     <option name="servers">
-      <webServer id="6a121249-7c21-4a75-b299-daea0396da19" name="pldpk (project level)" url="http://172.22.8.102">
+      <webServer id="fabcd832-7411-45cf-97ad-728db3a638b1" name="pldpk" url="http://172.22.8.102">
         <fileTransfer host="172.22.8.102" port="21">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" />
           </advancedOptions>
           <option name="port" value="21" />
         </fileTransfer>
-      </webServer>
-      <webServer id="6647ece5-df95-48a7-9ba5-732f945a9fd5" name="localhost" url="http://localhost/test">
-        <fileTransfer port="0" mountedRoot="C:\xampp\htdocs\test" accessType="MOUNT" />
       </webServer>
     </option>
   </component>
