@@ -68,37 +68,32 @@ var wbr=1;
 
 
 $(document).ready(function() {
-
     //SCRAPS CHART INIT/UPDATE
-
     updateDashboard();
-
     //MAIN TABLE INIT/UPDATE
-    statsInterval = setInterval(function () {
-        $.getJSON('php/getForecast.php', function(data)
-        {
-            shift=moment().format('HH');
-
-            if(shift >=6 && shift <14)
-                shiftPlan=data.MAIN_TABLE.PLAN1;
-            else if (shift >=14 && shift <22)
-                shiftPlan=data.MAIN_TABLE.PLAN2;
-            else
-                shiftPlan=data.MAIN_TABLE.PLAN3;
-
-            $('#curing').html("<span class='mdl-layout--large-screen-only'>"+data.MAIN_TABLE.CURING_OUTPUT+" /</span> "+data.MAIN_TABLE.CURING_PRED +"<br><span style='font-size: 80%'>("+(data.MAIN_TABLE.CURING_PRED-shiftPlan)+")</span>");
-            $('#inspection').html("<span class='mdl-layout--large-screen-only'>"+data.MAIN_TABLE.INSPECTION_OUTPUT+" /</span> "+data.MAIN_TABLE.INSPECTION_FORECAST+"<br><span style='font-size: 80%'>("+(data.MAIN_TABLE.INSPECTION_FORECAST-data.MAIN_TABLE.CURING_PRED)+")</span>");
-            $('#fvm').html("<span class='mdl-layout--large-screen-only'>"+data.MAIN_TABLE.FVM_OUTPUT+" /</span> "+data.MAIN_TABLE.FVM_FORECAST+"<br><span style='font-size: 80%'>("+(data.MAIN_TABLE.FVM_FORECAST-data.MAIN_TABLE.CURING_PRED)+")</span>");
-            $('#stock').html("<span class='mdl-layout--large-screen-only'>"+data.MAIN_TABLE.STOCK+"<br><span style='font-size: 80%'>("+(data.MAIN_TABLE.STOCK-data.MAIN_TABLE.LABO)+")</span>");
-
-            // inspectionChartData=data.MAIN_TABLE.SUPPORT_CHARTS.INSPECTION;
-            // inspectionChart();
-            // curingChartData=data.MAIN_TABLE.SUPPORT_CHARTS.CURING;
-            // curingChart();
-        });
-        },30000);
-
-
+    // statsInterval = setInterval(function () {
+    //     $.getJSON('php/getForecast.php', function(data)
+    //     {
+    //         shift=moment().format('HH');
+    //
+    //         if(shift >=6 && shift <14)
+    //             shiftPlan=data.MAIN_TABLE.PLAN1;
+    //         else if (shift >=14 && shift <22)
+    //             shiftPlan=data.MAIN_TABLE.PLAN2;
+    //         else
+    //             shiftPlan=data.MAIN_TABLE.PLAN3;
+    //
+    //         $('#curing').html("<span class='mdl-layout--large-screen-only'>"+data.MAIN_TABLE.CURING_OUTPUT+" /</span> "+data.MAIN_TABLE.CURING_PRED +"<br><span style='font-size: 80%'>("+(data.MAIN_TABLE.CURING_PRED-shiftPlan)+")</span>");
+    //         $('#inspection').html("<span class='mdl-layout--large-screen-only'>"+data.MAIN_TABLE.INSPECTION_OUTPUT+" /</span> "+data.MAIN_TABLE.INSPECTION_FORECAST+"<br><span style='font-size: 80%'>("+(data.MAIN_TABLE.INSPECTION_FORECAST-data.MAIN_TABLE.CURING_PRED)+")</span>");
+    //         $('#fvm').html("<span class='mdl-layout--large-screen-only'>"+data.MAIN_TABLE.FVM_OUTPUT+" /</span> "+data.MAIN_TABLE.FVM_FORECAST+"<br><span style='font-size: 80%'>("+(data.MAIN_TABLE.FVM_FORECAST-data.MAIN_TABLE.CURING_PRED)+")</span>");
+    //         $('#stock').html("<span class='mdl-layout--large-screen-only'>"+data.MAIN_TABLE.STOCK+"<br><span style='font-size: 80%'>("+(data.MAIN_TABLE.STOCK-data.MAIN_TABLE.LABO)+")</span>");
+    //
+    //         // inspectionChartData=data.MAIN_TABLE.SUPPORT_CHARTS.INSPECTION;
+    //         // inspectionChart();
+    //         // curingChartData=data.MAIN_TABLE.SUPPORT_CHARTS.CURING;
+    //         // curingChart();
+    //     });
+    //     },300000);
 });
 
 function mainTableFill()

@@ -1,0 +1,120 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="bower_components/amcharts3/amcharts/amcharts.js"></script>
+<script src="bower_components/amcharts3/amcharts/serial.js"></script>
+<script src="bower_components/jquery/dist/jquery.min.js"></script>
+<script src="bower_components/moment/moment.js"></script>
+<link rel="stylesheet" href="bower_components/material-design-lite/material.css">
+<script src="bower_components/material-design-lite/material.min.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<script src="js/mainPage.js"></script>
+<link rel="stylesheet" href="css/mainStyle.css">
+<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+<link href="https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css"
+      rel="stylesheet">
+<script>
+
+
+    function fetchIld() {
+        var now = moment();
+        $('#ildTab').html('');
+        $.getJSON('php/getIld.php', function (data) {
+
+            var okWeek = 0;
+            var NokWeek = 0;
+            var okWtd = 0;
+
+            var pos = 0;
+            for (var i = 0; i < data.length; i++) {
+                pos++;
+                if (data[i].STOCK_WTD_STK <= data[i].PLAN_WEEK * 1.1 && data[i].STOCK_WTD_STK >= data[i].PLAN_WEEK * 0.9)
+                    okWeek++;
+
+                if (data[i].STOCK_WTD_GP3 <= data[i].PLAN_WTD * 1.1 && data[i].STOCK_WTD_GP3 >= data[i].PLAN_WTD * 0.9)
+                    okWtd++;
+
+                $('#ildTab').append('<tr style="height:auto;background-color:' + (data[i].SUFFIX != '00' ? '#4bf4da' : '') + '">' +
+                    '<td class="noPrint" class="noPrint"style="height:auto;padding:2px; white-space: normal;">' + (data[i].SAP) + '/' + data[i].SUFFIX + '</td>' +
+                    '<td style="height:auto;padding:2px; white-space: normal;">' + (data[i].DPICS) + '</td>' +
+                    '<td style="height:auto;padding:2px; white-space: normal;">' + (data[i].CTCODE) + '</td>' +
+                    '<td class="noPrint" style="height:auto;padding:2px; white-space: normal;">' + (data[i].PALLET_QTY) + '</td>' +
+                    '<td style="height:auto;padding:2px; white-space: normal;font-size:90%;width:20%;">' + (data[i].DESC) + '</td>' +
+                    '<td style="height:auto;padding:2px; white-space: normal;">' + (data[i].PLAN_WEEK) + '</td>' +
+                    '<td style="height:auto;padding:2px; white-space: normal;color:' + (data[i].CURE_WTD > data[i].PLAN_WTD * 1.01 ? 'green' : data[i].CURE_WTD > data[i].PLAN_WTD ? 'orange' : 'red') + '">' + (data[i].CURE_WTD) + '</td>' +
+                    '<td class="noPrint" style="height:auto;padding:2px; white-space: normal;">' + (data[i].STOCK_WTD_GP3) + '</td>' +
+                    '<td style="height:auto;padding:2px; white-space: normal;font-weight: bold;" class="' + ((data[i].PRZET) < 16 ? 'negativeCell' : ((data[i].PRZET) < 32) ? 'neutralCell' : '') + '">' + ('' || data[i].STOCK_WTD_STK) + '</td>' +
+                    '<td style="height:auto;padding:2px; white-space: normal;">' + (data[i].PLAN_WEEK * 0.9).toFixed(0) + '</td>' +
+                    '<td style="height:auto;padding:2px; white-space: normal;">' + (data[i].PLAN_WEEK * 1.1).toFixed(0) + '</td>' +
+                    '<td style="height:auto;padding:2px; white-space: normal;" class="' + (data[i].PLAN_WEEK * 1.1 - data[i].STOCK_WTD_STK < 0 ? 'negativeCell' : data[i].PLAN_WEEK * 0.9 > data[i].STOCK_WTD_STK ? 'neutralCell' : 'positiveCell') + '">' + (data[i].PLAN_WEEK * 0.9 - data[i].STOCK_WTD_STK > 0 ? (data[i].PLAN_WEEK * 0.9 - data[i].STOCK_WTD_STK).toFixed(0) : '') + '</td>' +
+                    '<td style="height:auto;padding:2px; white-space: normal;" class="' + (data[i].PLAN_WEEK * 1.1 - data[i].STOCK_WTD_STK < 0 ? 'negativeCell' : data[i].PLAN_WEEK * 0.9 > data[i].STOCK_WTD_STK ? 'neutralCell' : 'positiveCell') + '">' + (data[i].PLAN_WEEK * 1.1 - data[i].STOCK_WTD_STK).toFixed(0) + '</td>' +
+                    // '<td style="height:auto;padding:2px; white-space: normal;" class="'+((data[i].PRZET) < 16 ? 'negativeCell' : ((data[i].PRZET) < 32) ? 'neutralCell' : '' )+'">'+((data[i].PRZET) >0 ? data[i].PRZET : 'PRZETERMINOWANE')+'</td>' +
+                    // '<td style="height:auto;padding:2px;white-space: normal;">'+(data[i].id)+'</td>' +
+                    '</tr>');
+
+            }
+            $('#headerIld').html('</br>OSTATNIA AKTUALIZACJA: ' + now.format('YY-MM-DD HH:mm:ss') + ' </br> ANALIZA Z DNIA: <u>' + data[0].DAY + '</u></br> ILD NARASTAJĄCO: ' + (okWtd / pos * 100).toFixed(2) + '% ' + (okWtd) + '/' + pos + '</br><strong> ILD TYDZIEN: ' + (okWeek / pos * 100).toFixed(2) + '% ' + (okWeek) + '/' + pos + '</strong>');
+        });
+    }
+
+    fetchIld();
+</script>
+
+
+<div class="page-content">
+    <!--NAGLOWEK-->
+    <div class="mdl-grid mdl-grid--no-spacing">
+        <div class="mdl-layout-spacer"></div>
+        <div id="headerIld"
+             class="mdl-cell mdl-cell--stretch mdl-cell--12-col-phone mdl-cell--10-col-desktop mdl-cell--12-col-tablet"
+             style="text-align:center; ">
+            ILD, LADOWANIE...
+        </div>
+        <div class="mdl-layout-spacer"></div>
+    </div>
+
+    <!--SEKCJA STEROWANIA - PRZYCISK ODSWIEZANIA ITD.-->
+    <div class="mdl-grid mdl-grid--no-spacing">
+        <div class="mdl-layout-spacer"></div>
+        <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" onclick="fetchIld(); ">
+            ODSWIEZ
+        </button>
+        <div class="mdl-layout-spacer"></div>
+    </div>
+    </br>
+
+    <div class="mdl-grid mdl-grid--no-spacing" id="section-to-print">
+        <div class="mdl-layout-spacer"></div>
+        <div id="ildContent"
+             class="mdl-cell mdl-cell--stretch mdl-cell--12-col-phone mdl-cell--10-col-desktop mdl-cell--12-col-tablet section-to-print">
+            <!--<div class="mdl-cell mdl-cell&#45;&#45;stretch mdl-cell&#45;&#45;12-col-phone mdl-cell&#45;&#45;6-col-desktop mdl-cell&#45;&#45;12-col-tablet ">-->
+            <!--<p>Start Date: <input type = "text" id = "datepicker-13"></p>-->
+            <!--</div>-->
+            <!--<div class="mdl-cell mdl-cell&#45;&#45;stretch mdl-cell&#45;&#45;12-col-phone mdl-cell&#45;&#45;6-col-desktop mdl-cell&#45;&#45;12-col-tablet ">-->
+            <!--<p>Finish Date: <input type = "text" id = "datepicker-12"></p>-->
+            <!--</div>-->
+            <!--<div id="p2" class="mdl-progress mdl-js-progress mdl-progress__indeterminate" style="width:100%;"></div>-->
+            <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp" id="ild" style="">
+                <thead>
+                <tr>
+                    <th class="noPrint">SAP</th>
+                    <th>DPICS</th>
+                    <th>CT</th>
+                    <th class="noPrint">PALETA</th>
+                    <th>ROZMIAR</th>
+                    <th>PLAN T</th>
+                    <th>WULK WTD</th>
+                    <th class="noPrint">ZDANIE GP3</th>
+                    <th>ZDANIE STK</th>
+                    <th>MIN</th>
+                    <th>MAX</th>
+                    <th>POZOSTAŁO </br><span style="font-size:80%;">min</span></th>
+                    <th>POZOSTAŁO </br><span style="font-size:80%;">max</span></th>
+                </tr>
+                </thead>
+                <tbody id="ildTab" style="padding: 0px;">
+                </tbody>
+            </table>
+        </div>
+        <div class="mdl-layout-spacer"></div>
+    </div>
+</div>

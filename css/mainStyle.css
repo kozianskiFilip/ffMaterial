@@ -41,20 +41,6 @@ th {
   color: black;
   font-weight: bold;
 }
-@media print {
-  body * {
-    visibility: hidden;
-  }
-  #section-to-print,
-  #section-to-print * {
-    visibility: visible;
-  }
-  #section-to-print {
-    position: absolute;
-    left: 0;
-    top: 0;
-  }
-}
 .inspectionCell {
   height: auto;
   padding: 0px;
@@ -71,15 +57,49 @@ th {
   background-color: #ef5350;
   border-right-style: solid ;
 }
-
+#ild * {
+  padding: auto;
+}
 @media only screen and (max-width: 650px) {
-    #prepInventory th,
-    td {
-        font-size: 10px;
-    }
-
-    #fvmTable th,
-    td {
-        font-size: 7px;
-    }
+  #prepInventory th,
+  td {
+    font-size: 8px;
+  }
+  #prepInventory th {
+    font-size: 8px;
+  }
+  #fvmTable th,
+  td {
+    text-align: center;
+    font-size: 8px;
+    padding-left: 0px;
+  }
+  #fvmTable th {
+    font-size: 18px;
+  }
+  .noPrint {
+    visibility: hidden;
+    display: none;
+  }
+}
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #section-to-print,
+  #section-to-print * {
+    visibility: visible;
+  }
+  #section-to-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+  .noPrint {
+    visibility: hidden;
+    display: none;
+  }
+  td * {
+    all: initial;
+  }
 }
