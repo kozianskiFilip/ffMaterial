@@ -11,10 +11,55 @@
     <link rel="stylesheet" href="bower_components/material-design-lite/material.min.css">
     <script src="bower_components/material-design-lite/material.min.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="css/mainStyle.css">
+    <style type="text/css">
+
+    </style>
+    <script>
+
+        var holdsArray=[];
+        var holdsObject={};
+
+            function fetchHoldsFVM()
+            {
+               // alert('x');
+                $.getJSON('php/getHolds.php', function (data) {
+                    //alert(data.length);
+                    for (var i = 0; i < data.length; i++) {
+
+                        if(holdsArray.includes(data[i].KEY))
+                            continue;
+
+                        holdsArray.push(data[i].KEY);
+
+                        if(data[i].TOT>=5)
+                         $("#holdCards").after("<div class=\"alert alert-danger\" role=\"alert\">" +
+                                                     "<button type=\"button\" class=\"close-alert\">×</button>" +
+                                                     data[i].CODE + " <b>"+data[i].TOT+"x " +data[i].DESC+"</b> - TBM:"+data[i].TBM +", "+data[i].OPERATOR+" "+data[i].DAY+"/"+data[i].SHIFT+ "zm. - "+data[i].FVMS+
+                        " </div>");
+                        else
+                            $("#holdCards").after("<div class=\"alert alert-warning\" role=\"alert\">" +
+                                                    "<button type=\"button\" class=\"close-alert\">×</button>" +
+                                                    data[i].CODE + " <b>"+data[i].TOT+"x " +data[i].DESC+"</b> - TBM:"+data[i].TBM +", "+data[i].OPERATOR+" "+data[i].DAY+"/"+data[i].SHIFT+ "zm. - "+data[i].FVMS+
+                            " </div>");
+                        //alert(data[i].FVM_HOLDS.CODE);
+                    }
+                });
+            }
+            fetchHoldsFVM();
+
+
+
+        $(".close-alert").click(function(e){
+            $(this).parent().remove();
+            e.preventDefault();
+        });
+    </script>
 </head>
 <body>
-    <div id="scrapsTotal" style="width:100%;"></div>
-    <div id="scrapsHistory" style="width:100%;"></div>
-    <div id="scrapsTotal" style="width:100%;"></div>
+<button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" onclick="fetchHoldsFVM();">
+    ODSWIEZ
+</button>
+<div id="holdCards"></div>
 </body>
 </html>

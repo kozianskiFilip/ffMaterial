@@ -70,6 +70,7 @@ if($h>=22 || $h<6)
     $zmiana=3;
 }
 
+
 $stid = oci_parse($ffmes_connection,"select dstamp,pred,output,prod,inv_ok,inv_nok,bc3_output,bc3_pred,klasowanie,klasowanie_pred, fvm,fvm_pred,sort1,sort2, trimmers, 
                                             PLAN_EXCEL_1, PLAN_EXCEL_2, PLAN_EXCEL_3, PLAN_EXCEL_TOTAL,
                                             SKU, CT_DOBA,GT_DOBA, PLAN_GP3, ZDANIE, REPLACEMENT,OE,LABO, h100_cur_output,h100_cur_pred,h100_ff_output,h100_ff_pred,h100_fvm,h100_fvm_pred,krupp_output,plt_output,trad_output,krupp_inv,plt_inv,trad_inv,krup_nok_inv,plt_nok_inv,trad_nok_inv,krupp_pred,plt_pred,trad_pred from
@@ -85,7 +86,7 @@ $stid = oci_parse($ffmes_connection,"select dstamp,pred,output,prod,inv_ok,inv_n
                                                 sum(case when suffix like '00' then qty else 0 end) REPLACEMENT,
                                                 sum(case when suffix IN ('T', 'L') then qty else 0 end) LABO,
                                                 sum(case when suffix NOT IN ('T', 'L', '00') then qty else 0 end) OE
-                                                from  stk_pallet@sbs_real
+                                                from  stk_pallet@sbs
                                                 where substr(LABEL_NUM,1,8) in('".$stockDay."')  and ident='IN') on 1=1
                                             where rownum=1");
 oci_execute($stid);
@@ -161,7 +162,7 @@ while ($row = oci_fetch_array($stid, OCI_BOTH)) {
 
 //PROLAG INVENTORY
 $prepInventoryArray = array();
-$stid = oci_parse($ffmes_connection, "select 
+$stid = oci_parse($ffmes_connection, "select
                                                     mat_group, sum(case when qa_attr=1 then qty else 0 end) OK_QTY,sum(case when qa_attr=0 then qty else 0 end) NOK_QTY, sum(case when qa_attr=1 then 1 else 0 end) OK_QTY_PCS, sum(case when qa_attr=0 then 1 else 0 end) NOK_QTY_PCS,
                                                     sum(case when qa_attr=1 and qty<0.9*max_QTY then 1 else 0 end) OK_HALFS_PCS, sum(case when qa_attr=1 and sysdate>min_usage_date then 1 else 0 end) OK_AGED
                                                     from prolag_prep_inv@prolag where prod_machine not like '%MRT%' and prod_machine !='QUADRO' and prod_machine !='FISHER' group by mat_group");

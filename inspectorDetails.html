@@ -14,11 +14,12 @@
     var now=moment();
     var urlParams = new URLSearchParams(window.location.search);
     var insp = urlParams.get('inspector');
+    var inspDay = urlParams.get('day');
     //var duration = moment.duration(now.diff(startDtime)).as('minutes')+10;
 
     $('#inspectorsTab').html('');
   //  alert('j');
-        $.getJSON('localhost/node/inspector='+insp, function(data) {
+        $.getJSON('localhost/node/inspector='+insp+"&day="+inspDay, function(data) {
         for(var i=0; i< data.length; i++)
         {
             //adr = 'inspectorDetails.html?inspector='+data[i].czasPrzerw;
@@ -80,3 +81,5 @@
         <div class = "mdl-layout-spacer"></div>
     </div>
 </div>
+
+

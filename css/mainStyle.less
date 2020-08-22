@@ -3,6 +3,23 @@
 @neutralColor: #FFEB3B;
 
 
+.positiveCell {
+  background-color: @positiveColor;
+  color: white;
+}
+
+.negativeCell {
+  background-color: @negativeColor;
+  color: white;
+}
+
+.neutralCell {
+  background-color: @neutralColor;
+  color: black;
+  font-weight: bold;
+}
+
+
 @negativeSecondaryColor: #ef5350;
 @neutralSecondaryColor: #ffeb3b;
 @positiveSecondaryColor: #66bb6a;
@@ -15,13 +32,25 @@
   width:100%;
   text-align: center;
 }
-#my-table td, th {
+
+//MIXIN TABLE CELL
+.tableCell{
   width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   -o-text-overflow: ellipsis;
   text-align: center;
+}
+
+//ZAGNIEŻDZANIE I UŻYCIE MIXINU
+#my-table  {
+  td {
+    .tableCell;
+  }
+  th{
+    .tableCell;
+  }
 }
 
 /* unrelated to responsive table css */
@@ -60,19 +89,20 @@
 
 .inspectionCell
 {
-
   height:auto;
   padding: 0px;
 }
+
+
 .neutralCellInspection
  {
-   background-color: @neutralSecondaryColor;
+   background-color: @neutralColor;
    border-right-style: solid;
  }
 
 .positiveCellInspection
 {
-  background-color: @positiveSecondaryColor;
+  background-color: @positiveColor;
   border-right-style: solid ;
 }
 
@@ -110,6 +140,13 @@
     visibility: hidden;
     display: none;
   }
+
+  td {
+    width:auto;
+  }
+  td {
+    width: auto;
+  }
 }
 
 @media print {
@@ -133,6 +170,71 @@
   }
 
   td * {
-    all: initial;
+
   }
+}
+
+//FUNKCJONALNOŚ ALERTU
+//alert
+.alert {
+  min-width: 150px;
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+@extend .shadow-1;
+  &:hover{
+  @extend .shadow-2;
+  }
+  &-success{
+    background-color: lighten(#5cb85c, 15%);
+    border-color: lighten(#5cb85c, 10%);
+    color: darken(#5cb85c, 15%);
+  }
+  &-warning{
+    background-color: lighten(#E2A41F, 15%);
+    border-color: lighten(#E2A41F, 10%);
+    color: darken(#E2A41F, 15%);
+  }
+  &-danger{
+    background-color: lighten(#d43f3a, 15%);
+    border-color: lighten(#d43f3a, 10%);
+    color: darken(#d43f3a, 15%);
+  }
+  p{
+    padding: 0;
+    margin: 0;
+  }
+  i{
+    padding-right: 5px;
+    vertical-align: middle;
+    font-size: 24px;
+  }
+  .close-alert{
+    -webkit-appearance: none;
+    position: relative;
+    float: right;
+    padding: 0;
+    border: 0;
+    cursor: pointer;
+    color: inherit;
+    background: 0 0;
+    font-size: 21px;
+    line-height: 1;
+    font-weight: bold;
+    text-shadow: 0 1px 0 rgba(255,255,255,.7);
+    filter: alpha(opacity=40);
+    opacity: .4;
+    &:hover{
+      filter: alpha(opacity=70);
+      opacity: .7;
+    }
+  }
+}
+
+.shadow-1{
+  box-shadow: 0 1px 3px rgba(#000, .12), 0 1px 2px rgba(#000, .24) ;
+}
+.shadow-2{
+  box-shadow: 0 3px 6px rgba(#000, .16), 0 3px 6px rgba(#000, .23) ;
 }

@@ -91,3 +91,4 @@ while ($row = oci_fetch_array($stid, OCI_BOTH))
 }
 
 echo json_encode($data,JSON_NUMERIC_CHECK);
+oci_close($ffmes_connection);

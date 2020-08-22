@@ -17,26 +17,36 @@ function fetchInspection()
     if (now.hour() >= 22) {
 
         startDtime = moment('22:00:00', 'HH:mm:ss');
+        endDtime=now;
         endDtime.add(1, 'd');
         endDtime = moment('06:00:00', 'HH:mm:ss');
     }
     if (now.hour() < 6) {
+        startDtime=now;
         startDtime.subtract(1, 'd');
         startDtime = moment('22:00:00', 'HH:mm:ss');
         endDtime = moment('06:00:00', 'HH:mm:ss');
     }
 
+
     var duration = moment.duration(now.diff(startDtime)).as('minutes')+10;
 
     $('#inspectorsTab').html('');
     $.getJSON('localhost/node/', function(data) {
+        var j=1;
+        var output=0;
         for(var i=0; i< data.length; i++)
         {
+           if(data[i].stanowiska);
+             output+=data[i].wykonanie;
+
             if(data[i].wykonanie<10)
                 continue;
+                j++;
 
             $('#inspectorsTab').append('<tr style="height:auto">' +
-                '<td onclick="window.open(\'inspectorDetails.html?inspector=\'+this.id,\'XXX\', \'width=1200,height=800,titlebar=no,toolbar=no,location=no,status=no,menubar=no,\');" style="height:auto;padding:2px; white-space: normal;cursor: pointer;" id="'+(data[i].id)+'">'+(data[i].brakarz).toUpperCase()+'</td>' +
+               '<td class="mdl-layout--large-screen-only" style="height:auto;padding:2px;">'+(j)+'</td>'+
+                '<td onclick="window.open(\'inspectorDetails.html?inspector=\'+this.id,\'XXX\', \'width=1200,height=800,titlebar=no,toolbar=no,location=no,status=no,menubar=no,\');" style="height:auto;padding:2px; white-space: nowrap;cursor: pointer;" id="'+(data[i].id)+'">'+(data[i].brakarz).toUpperCase()+'</td>' +
                 '<td style="height:auto;padding:2px;font-size:xx-small;white-space: normal;" class="mdl-layout--large-screen-only">'+(data[i].stanowiska)+'</td>' +
                 '<td class="inspectionCell '+(data[i].czasNieobecnosci > 15 ? 'negativeCellInspection': ( data[i].czasNieobecnosci > 5 ? 'neutralCellInspection' : 'positiveCellInspection'))+'" style="border-right-style: solid;height:auto;padding:2px;">'+(data[i].czasNieobecnosci).toFixed(2)+'</td>' +
                 '<td class="'+((data[i].wykonanie/duration*480) >= 705 ? 'positiveCell' : ( (data[i].wykonanie/duration*480) >= 685 ? 'neutralCell': 'negativeCell'))+'" style="height:auto;padding:2px;">'+data[i].wykonanie+'('+(data[i].wykonanie/duration*480).toFixed(0)+')</td>' +
@@ -54,10 +64,17 @@ function fetchInspection()
                 '</tr>');
 
         }
-        $('#headerInspection').html('WYDAJNOSC KLASOWANIA, AKTUALIZACJA: '+now.format('YY-MM-DD HH:mm:ss'));
+        //alert(output);
+        $('#headerInspection').html('WYDAJNOSC KLASOWANIA - <span style="font-color:blue; font-style: italic;">'+output+'('+(output/duration*480).toFixed(0)+')</span>, AKTUALIZACJA: '+now.format('YY-MM-DD HH:mm:ss'));
     });
 }
 
 fetchInspection();
+
+$(".close-alert").click(function(e){
+    $(this).parent().remove();
+    e.preventDefault();
+});
+
 
 

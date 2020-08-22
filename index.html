@@ -32,9 +32,9 @@
                 <nav class="mdl-navigation mdl-layout--large-screen-only">
                     <a class="mdl-navigation__link" target="_blank" href="http://172.22.8.62:8095/curmes/ShiftRepSum.aspx">CUREMES</a>
                     <a class="mdl-navigation__link" target="_blank" href="http://plda5l2">L2</a>
-                    <a class="mdl-navigation__link" target="_blank" href="http://172.22.11.18/usc">USC</a>
-                    <a class="mdl-navigation__link" target="_blank" href="http://172.22.11.18/stk">STK</a>
-                    <a class="mdl-navigation__link is-active" target="_blank" href="http://172.22.11.18/sbs">SBS</a>
+                    <a class="mdl-navigation__link" target="_blank" href="http://172.22.8.65/usc">USC</a>
+                    <a class="mdl-navigation__link" target="_blank" href="http://172.22.8.65/stk">STK</a>
+                    <a class="mdl-navigation__link is-active" target="_blank" href="http://172.22.8.65/sbs">SBS</a>
                 </nav>
             </div>
         </header>
@@ -54,9 +54,9 @@
                 <a class="mdl-navigation__link is-active" onclick="$('#section-to-print').load('ild.html');"
                    target="_blank">ILD</a>
                 <a class="mdl-navigation__link">
-                    <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-2">
-                        <input type="checkbox" id="switch-2" class="mdl-switch__input" disabled>
-                        <span class="mdl-switch__label" ></span>
+                    <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-4">
+                        <input type="checkbox" id="switch-4" class="mdl-switch__input" onclick="fetchHoldsFVM();">
+                        <span class="mdl-switch__label" >KW</span>
                     </label>
                 </a>
             </nav>
@@ -162,7 +162,7 @@
                 <div class="mdl-grid  mdl-grid--no-spacing">
                     <div class = "mdl-layout-spacer"></div>
                     <div class="mdl-cell mdl-cell--12-col-phone mdl-cell--10-col-desktop mdl-cell--10-col-tablet" style="align-items: center; text-align: center;">
-                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" onclick="scrapChartRefreshMode=1 ;scrapsShift(); clearInterval(scrapInterval); scrapChartAutoUpdate = 0;">
+                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored no-spam" onclick="scrapChartRefreshMode=1 ;scrapsShift(); clearInterval(scrapInterval); scrapChartAutoUpdate = 0;">
                             ZM1
                         </button>
                         <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect" onclick="scrapChartRefreshMode= 2;scrapsShift(); clearInterval(scrapInterval); scrapChartAutoUpdate = 0;">
@@ -181,7 +181,6 @@
                                 class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect"
                                 style="background-color: #00acc1">PREP INV
                         </button>
-
                     </div>
                     <div class = "mdl-layout-spacer"></div>
                 </div>
@@ -194,16 +193,21 @@
                     </div>
                     <div class="mdl-cell mdl-cell--6-col-phone mdl-cell--5-col-desktop mdl-cell--5-col-tablet" style="text-align: center; font-weight: bold;align-items: center;">
                         <a style="font-weight: bold; color: slateblue">H100</a>
-                        <label class="mdl-switch mdl-js-switch" style="width:auto;padding-left: auto;" for="checkbox-2"><input type="checkbox" id="checkbox-2" onclick="if(!wbr & h100) {this.checked=true;} else {if(h100) h100=0; else h100=1; scrapsShift();}" class="mdl-switch__input" checked>  </label>
+                        <label class="mdl-switch mdl-js-switch" style="width:auto;padding-left: auto;" for="checkbox-2"><input type="checkbox" id="checkbox-2" onclick="if(!wbr & h100) {this.checked=true;} else {if(h100) h100=0; else h100=1; scrapsShift();}" class="mdl-switch__input">  </label>
                     </div>
                     <div class = "mdl-layout-spacer"></div>
                 </div>
 
-
-
                 <div class="mdl-grid  mdl-grid--no-spacing">
                     <div class = "mdl-layout-spacer"></div>
                     <div id="scrapNumbers" class="mdl-cell mdl-cell--12-col-phone mdl-cell--10-col-desktop mdl-cell--10-col-tablet" style="text-align: center; font-weight: bold;"></div>
+                    <div class = "mdl-layout-spacer"></div>
+                </div>
+
+                <!--KARTY WSTRZYMANIA-->
+                <div class="mdl-grid  mdl-grid--no-spacing" >
+                    <div class = "mdl-layout-spacer"></div>
+                    <div id="holdCards" class="mdl-cell mdl-cell--12-col-phone mdl-cell--10-col-desktop mdl-cell--10-col-tablet"></div>
                     <div class = "mdl-layout-spacer"></div>
                 </div>
 
@@ -215,7 +219,12 @@
                     </div>
                     <div class = "mdl-layout-spacer"></div>
                 </div>
-
+                <!--GT/YIELD CHARTS-->
+                <div id="additionalCharts" class="mdl-grid mdl-grid--no-spacing">
+                    <div class = "mdl-layout-spacer"></div>
+                    <div id="gtScrapChart" class="mdl-cell mdl-cell--12-col-phone mdl-cell--10-col-desktop mdl-cell--10-col-table" style="height:200px; "></div>
+                    <div class = "mdl-layout-spacer"></div>
+                </div>
                 <!--BACKUP CHARTS-->
                 <div id="backupCharts" class="mdl-grid mdl-grid--no-spacing"  style="display:none;">
                     <div class = "mdl-layout-spacer"></div>

@@ -9,8 +9,8 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 <script src="js/mainPage.js"></script>
 <link rel="stylesheet" href="css/mainStyle.css">
-<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
-<link href="https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css"
+<script src="https://code.jquery.com/ui/1.010.4/jquery-ui.js"></script>
+<link href="https://code.jquery.com/ui/1.010.4/themes/ui-lightness/jquery-ui.css"
       rel="stylesheet">
 <script>
 
@@ -18,42 +18,115 @@
     function fetchIld() {
         var now = moment();
         $('#ildTab').html('');
-        $.getJSON('php/getIld.php', function (data) {
 
-            var okWeek = 0;
-            var NokWeek = 0;
-            var okWtd = 0;
 
-            var pos = 0;
-            for (var i = 0; i < data.length; i++) {
-                pos++;
-                if (data[i].STOCK_WTD_STK <= data[i].PLAN_WEEK * 1.1 && data[i].STOCK_WTD_STK >= data[i].PLAN_WEEK * 0.9)
-                    okWeek++;
+        //ŻĄDANIE Z UŻYCIEM CZYSTEGO AJAX
+        var xmlhttp;
+        if (window.XMLHttpRequest)
+            xmlhttp = new XMLHttpRequest();
+        else
+            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
 
-                if (data[i].STOCK_WTD_GP3 <= data[i].PLAN_WTD * 1.1 && data[i].STOCK_WTD_GP3 >= data[i].PLAN_WTD * 0.9)
-                    okWtd++;
 
-                $('#ildTab').append('<tr style="height:auto;background-color:' + (data[i].SUFFIX != '00' ? '#4bf4da' : '') + '">' +
-                    '<td class="noPrint" class="noPrint"style="height:auto;padding:2px; white-space: normal;">' + (data[i].SAP) + '/' + data[i].SUFFIX + '</td>' +
-                    '<td style="height:auto;padding:2px; white-space: normal;">' + (data[i].DPICS) + '</td>' +
-                    '<td style="height:auto;padding:2px; white-space: normal;">' + (data[i].CTCODE) + '</td>' +
-                    '<td class="noPrint" style="height:auto;padding:2px; white-space: normal;">' + (data[i].PALLET_QTY) + '</td>' +
-                    '<td style="height:auto;padding:2px; white-space: normal;font-size:90%;width:20%;">' + (data[i].DESC) + '</td>' +
-                    '<td style="height:auto;padding:2px; white-space: normal;">' + (data[i].PLAN_WEEK) + '</td>' +
-                    '<td style="height:auto;padding:2px; white-space: normal;color:' + (data[i].CURE_WTD > data[i].PLAN_WTD * 1.01 ? 'green' : data[i].CURE_WTD > data[i].PLAN_WTD ? 'orange' : 'red') + '">' + (data[i].CURE_WTD) + '</td>' +
-                    '<td class="noPrint" style="height:auto;padding:2px; white-space: normal;">' + (data[i].STOCK_WTD_GP3) + '</td>' +
-                    '<td style="height:auto;padding:2px; white-space: normal;font-weight: bold;" class="' + ((data[i].PRZET) < 16 ? 'negativeCell' : ((data[i].PRZET) < 32) ? 'neutralCell' : '') + '">' + ('' || data[i].STOCK_WTD_STK) + '</td>' +
-                    '<td style="height:auto;padding:2px; white-space: normal;">' + (data[i].PLAN_WEEK * 0.9).toFixed(0) + '</td>' +
-                    '<td style="height:auto;padding:2px; white-space: normal;">' + (data[i].PLAN_WEEK * 1.1).toFixed(0) + '</td>' +
-                    '<td style="height:auto;padding:2px; white-space: normal;" class="' + (data[i].PLAN_WEEK * 1.1 - data[i].STOCK_WTD_STK < 0 ? 'negativeCell' : data[i].PLAN_WEEK * 0.9 > data[i].STOCK_WTD_STK ? 'neutralCell' : 'positiveCell') + '">' + (data[i].PLAN_WEEK * 0.9 - data[i].STOCK_WTD_STK > 0 ? (data[i].PLAN_WEEK * 0.9 - data[i].STOCK_WTD_STK).toFixed(0) : '') + '</td>' +
-                    '<td style="height:auto;padding:2px; white-space: normal;" class="' + (data[i].PLAN_WEEK * 1.1 - data[i].STOCK_WTD_STK < 0 ? 'negativeCell' : data[i].PLAN_WEEK * 0.9 > data[i].STOCK_WTD_STK ? 'neutralCell' : 'positiveCell') + '">' + (data[i].PLAN_WEEK * 1.1 - data[i].STOCK_WTD_STK).toFixed(0) + '</td>' +
-                    // '<td style="height:auto;padding:2px; white-space: normal;" class="'+((data[i].PRZET) < 16 ? 'negativeCell' : ((data[i].PRZET) < 32) ? 'neutralCell' : '' )+'">'+((data[i].PRZET) >0 ? data[i].PRZET : 'PRZETERMINOWANE')+'</td>' +
-                    // '<td style="height:auto;padding:2px;white-space: normal;">'+(data[i].id)+'</td>' +
-                    '</tr>');
+        xmlhttp.onreadystatechange = function()
+        {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
+            {
+                var data=JSON.parse(xmlhttp.responseText);
+                var okWeek = 0;
+                var NokWeek = 0;
+                var okWtd = 0;
+                var stockSTKWtd = 0;
+                var stockGP3Wtd=0
+                var overStock=0;
+
+                var pos = 0;
+                for (var i = 0; i < data.length; i++) {
+                    pos++;
+                    if (data[i].STOCK_WTD_STK <= data[i].PLAN_WEEK * 1.01 && data[i].STOCK_WTD_STK >= data[i].PLAN_WEEK * 0.95)
+                        okWeek++;
+
+                    if(data[i].WTD_GP3_STK!=null)
+                        stockSTKWtd+=Number(data[i].WTD_GP3_STK);
+
+                    stockGP3Wtd+=Number(data[i].STOCK_WTD_GP3);
+
+                    if (data[i].STOCK_WTD_GP3 <= data[i].PLAN_WTD * 1.01 && data[i].STOCK_WTD_GP3 >= data[i].PLAN_WTD * 0.95)
+                        okWtd++;
+
+                    if((data[i].PLAN_WEEK * 1.01 - data[i].STOCK_WTD_STK).toFixed(0)<0)
+                        overStock++;
+
+                    $('#ildTab').append('<tr onmouseover="this.style.textDecoration=\'underline\'; this.style.fontWeight=\'bold\';" onmouseout="this.style.textDecoration=\'\'; this.style.fontWeight=\'initial\';" style="height:auto;background-color:' + (data[i].SUFFIX != '00' ? '#4bf4da' : '') + '">' +
+                        '<td class="noPrint" class="noPrint"style="height:auto;padding:2px; white-space: normal;">' + (data[i].SAP) + '/' + data[i].SUFFIX + '</td>' +
+                        '<td style="height:auto;padding:2px; white-space: normal;">' + (data[i].DPICS) + '</td>' +
+                        '<td style="height:auto;padding:2px; white-space: normal;">' + (data[i].CTCODE) + '</td>' +
+                        '<td class="noPrint" style="height:auto;padding:2px; white-space: normal;">' + (data[i].PALLET_QTY) + '</td>' +
+                        '<td style="height:auto;padding:2px; white-space: normal;font-size:90%;width:20%;">' + (data[i].DESC) + '</td>' +
+                        '<td style="height:auto;padding:2px; white-space: normal;">' + (data[i].PLAN_WEEK) + '</td>' +
+                        '<td style="height:auto;padding:2px; white-space: normal;color:' + (data[i].CURE_WTD > data[i].PLAN_WTD * 1.01 ? 'green' : data[i].CURE_WTD > data[i].PLAN_WTD ? 'orange' : 'red') + '">' + (data[i].CURE_WTD) + '</td>' +
+                        '<td class="noPrint '+(data[i].STOCK_WTD_GP3 - data[i].WTD_GP3_STK < -10 ? 'negativeCell' : '')+'" style="height:auto;padding:2px; white-space: normal;" id="' + data[i].SUFFIX + '">' + (data[i].STOCK_WTD_GP3) + '</td>' +
+                        '<td style="height:auto;padding:2px; white-space: normal;font-weight: bold;" class="' + ((data[i].PRZET) < 16 ? 'negativeCell' : ((data[i].PRZET) < 32) ? 'neutralCell' : '') + '">' + ('' || data[i].STOCK_WTD_STK) + '</td>' +
+                        '<td style="height:auto;padding:2px; white-space: normal;">' + (data[i].PLAN_WEEK * 0.95).toFixed(0) + '</td>' +
+                        '<td style="height:auto;padding:2px; white-space: normal;">' + (data[i].PLAN_WEEK * 1.01).toFixed(0) + '</td>' +
+                        '<td style="height:auto;padding:2px; white-space: normal;" value="'+((data[i].PLAN_WEEK * 0.95 - data[i].STOCK_WTD_STK < 150) && (data[i].PLAN_WEEK * 0.95 - data[i].STOCK_WTD_STK > 0) ? 1 : 0)+'"  class="' + (data[i].PLAN_WEEK * 1.01 - data[i].STOCK_WTD_STK < 0 ? 'negativeCell' : data[i].PLAN_WEEK * 0.95 > data[i].STOCK_WTD_STK ? 'neutralCell' : 'positiveCell') + '">' + (data[i].PLAN_WEEK * 0.95 - data[i].STOCK_WTD_STK > 0 ? (data[i].PLAN_WEEK * 0.95 - data[i].STOCK_WTD_STK).toFixed(0) : '') + '</td>' +
+                        '<td style="height:auto;padding:2px; white-space: normal;" class="' + (data[i].PLAN_WEEK * 1.01 - data[i].STOCK_WTD_STK < 0 ? 'negativeCell' : data[i].PLAN_WEEK * 0.95 > data[i].STOCK_WTD_STK ? 'neutralCell' : 'positiveCell') + '">' + (data[i].PLAN_WEEK * 1.01 - data[i].STOCK_WTD_STK).toFixed(0) + '</td>' +
+                        '<td style="height:auto;padding:2px; white-space: normal;" value="'+((data[i].PLAN_WEEK * 0.9 - data[i].STOCK_WTD_STK < 150) && (data[i].PLAN_WEEK * 0.9 - data[i].STOCK_WTD_STK > 0) ? 1 : 0)+'"  class="' + (data[i].PLAN_WEEK * 1.1 - data[i].STOCK_WTD_STK < 0 ? 'negativeCell' : data[i].PLAN_WEEK * 0.9 > data[i].STOCK_WTD_STK ? 'neutralCell' : 'positiveCell') + '">' + (data[i].PLAN_WEEK * 0.9 - data[i].STOCK_WTD_STK > 0 ? (data[i].PLAN_WEEK * 0.9 - data[i].STOCK_WTD_STK).toFixed(0) : '') + '</td>' +
+                        '<td style="height:auto;padding:2px; white-space: normal;" class="' + (data[i].PLAN_WEEK * 1.1 - data[i].STOCK_WTD_STK < 0 ? 'negativeCell' : data[i].PLAN_WEEK * 0.9 > data[i].STOCK_WTD_STK ? 'neutralCell' : 'positiveCell') + '">' + (data[i].PLAN_WEEK * 1.1 - data[i].STOCK_WTD_STK).toFixed(0) + '</td>' +
+
+                        '<td style="height:auto;padding:2px; white-space: normal; font-size:10px;">' + (data[i].CURED_LAST_4H) + '</td>' +
+                        '<td style="height:auto;padding:2px; white-space: normal; font-size:10px;">' + (data[i].FVM_LAST_10H) + '</td>' +
+                        '</tr>');
+                }
+                $('#headerIld').html('</br>OSTATNIA AKTUALIZACJA: ' + now.format('YY-MM-DD HH:mm:ss') + ' </br> ANALIZA Z DNIA: <u>' + data[0].DAY + '</u></br>STOCK STK: '+stockSTKWtd+', GP3: '+stockGP3Wtd+'</br> ILD NARASTAJĄCO: ' + (okWtd / pos * 100).toFixed(2) + '% ' + (okWtd) + '/' + pos + '</br><strong> ILD TYDZIEN: ' + (okWeek / pos * 100).toFixed(2) + '% ' + (okWeek) + '/' + pos + '</strong></br>PRZEKROCZENIA:<span style="color:red; font-weight:bold;">  '+overStock+'</span>');
 
             }
-            $('#headerIld').html('</br>OSTATNIA AKTUALIZACJA: ' + now.format('YY-MM-DD HH:mm:ss') + ' </br> ANALIZA Z DNIA: <u>' + data[0].DAY + '</u></br> ILD NARASTAJĄCO: ' + (okWtd / pos * 100).toFixed(2) + '% ' + (okWtd) + '/' + pos + '</br><strong> ILD TYDZIEN: ' + (okWeek / pos * 100).toFixed(2) + '% ' + (okWeek) + '/' + pos + '</strong>');
-        });
+        };
+        xmlhttp.open("GET", "php/getIld.php", true);
+        xmlhttp.send();
+
+        //ŻĄDANIE Z UŻYCIEM jQuerry
+        // $.getJSON('php/getIld.php', function (data) {
+        //     var okWeek = 0;
+        //     var NokWeek = 0;
+        //     var okWtd = 0;
+        //     var stockSTKWtd = 0;
+        //     var stockGP3Wtd=0
+        //
+        //     var pos = 0;
+        //     for (var i = 0; i < data.length; i++) {
+        //         pos++;
+        //         if (data[i].STOCK_WTD_STK <= data[i].PLAN_WEEK * 1.01 && data[i].STOCK_WTD_STK >= data[i].PLAN_WEEK * 0.95)
+        //             okWeek++;
+        //
+        //         if(data[i].WTD_GP3_STK!=null)
+        //             stockSTKWtd+=Number(data[i].WTD_GP3_STK);
+        //
+        //         stockGP3Wtd+=Number(data[i].STOCK_WTD_GP3);
+        //
+        //         if (data[i].STOCK_WTD_GP3 <= data[i].PLAN_WTD * 1.01 && data[i].STOCK_WTD_GP3 >= data[i].PLAN_WTD * 0.95)
+        //             okWtd++;
+        //
+        //         $('#ildTab').append('<tr onmouseover="this.style.textDecoration=\'underline\'; this.style.fontWeight=\'bold\';" onmouseout="this.style.textDecoration=\'\'; this.style.fontWeight=\'initial\';" style="height:auto;background-color:' + (data[i].SUFFIX != '00' ? '#4bf4da' : '') + '">' +
+        //             '<td class="noPrint" class="noPrint"style="height:auto;padding:2px; white-space: normal;">' + (data[i].SAP) + '/' + data[i].SUFFIX + '</td>' +
+        //             '<td style="height:auto;padding:2px; white-space: normal;">' + (data[i].DPICS) + '</td>' +
+        //             '<td style="height:auto;padding:2px; white-space: normal;">' + (data[i].CTCODE) + '</td>' +
+        //             '<td class="noPrint" style="height:auto;padding:2px; white-space: normal;">' + (data[i].PALLET_QTY) + '</td>' +
+        //             '<td style="height:auto;padding:2px; white-space: normal;font-size:90%;width:20%;">' + (data[i].DESC) + '</td>' +
+        //             '<td style="height:auto;padding:2px; white-space: normal;">' + (data[i].PLAN_WEEK) + '</td>' +
+        //             '<td style="height:auto;padding:2px; white-space: normal;color:' + (data[i].CURE_WTD > data[i].PLAN_WTD * 1.01 ? 'green' : data[i].CURE_WTD > data[i].PLAN_WTD ? 'orange' : 'red') + '">' + (data[i].CURE_WTD) + '</td>' +
+        //             '<td class="noPrint '+(data[i].STOCK_WTD_GP3 - data[i].WTD_GP3_STK < -10 ? 'negativeCell' : '')+'" style="height:auto;padding:2px; white-space: normal;" id="' + data[i].SUFFIX + '">' + (data[i].STOCK_WTD_GP3) + '</td>' +
+        //             '<td style="height:auto;padding:2px; white-space: normal;font-weight: bold;" class="' + ((data[i].PRZET) < 16 ? 'negativeCell' : ((data[i].PRZET) < 32) ? 'neutralCell' : '') + '">' + ('' || data[i].STOCK_WTD_STK) + '</td>' +
+        //             '<td style="height:auto;padding:2px; white-space: normal;">' + (data[i].PLAN_WEEK * 0.95).toFixed(0) + '</td>' +
+        //             '<td style="height:auto;padding:2px; white-space: normal;">' + (data[i].PLAN_WEEK * 1.01).toFixed(0) + '</td>' +
+        //             '<td style="height:auto;padding:2px; white-space: normal;" class="' + (data[i].PLAN_WEEK * 1.01 - data[i].STOCK_WTD_STK < 0 ? 'negativeCell' : data[i].PLAN_WEEK * 0.95 > data[i].STOCK_WTD_STK ? 'neutralCell' : 'positiveCell') + '">' + (data[i].PLAN_WEEK * 0.95 - data[i].STOCK_WTD_STK > 0 ? (data[i].PLAN_WEEK * 0.95 - data[i].STOCK_WTD_STK).toFixed(0) : '') + '</td>' +
+        //             '<td style="height:auto;padding:2px; white-space: normal;" class="' + (data[i].PLAN_WEEK * 1.01 - data[i].STOCK_WTD_STK < 0 ? 'negativeCell' : data[i].PLAN_WEEK * 0.95 > data[i].STOCK_WTD_STK ? 'neutralCell' : 'positiveCell') + '">' + (data[i].PLAN_WEEK * 1.01 - data[i].STOCK_WTD_STK).toFixed(0) + '</td>' +
+        //             // '<td style="height:auto;padding:2px; white-space: normal;" class="'+((data[i].PRZET) < 16 ? 'negativeCell' : ((data[i].PRZET) < 32) ? 'neutralCell' : '' )+'">'+((data[i].PRZET) >0 ? data[i].PRZET : 'PRZETERMINOWANE')+'</td>' +
+        //             // '<td style="height:auto;padding:2px;white-space: normal;">'+(data[i].id)+'</td>' +
+        //             '</tr>');
+        //     }
+        //     $('#headerIld').html('</br>OSTATNIA AKTUALIZACJA: ' + now.format('YY-MM-DD HH:mm:ss') + ' </br> ANALIZA Z DNIA: <u>' + data[0].DAY + '</u></br>STOCK STK: '+stockSTKWtd+', GP3: '+stockGP3Wtd+'</br> ILD NARASTAJĄCO: ' + (okWtd / pos * 100).toFixed(2) + '% ' + (okWtd) + '/' + pos + '</br><strong> ILD TYDZIEN: ' + (okWeek / pos * 100).toFixed(2) + '% ' + (okWeek) + '/' + pos + '</strong>');
+        // });
     }
 
     fetchIld();
@@ -77,6 +150,9 @@
         <div class="mdl-layout-spacer"></div>
         <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" onclick="fetchIld(); ">
             ODSWIEZ
+        </button>
+        <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" onclick="$('[value=0]').parent().toggle(); ">
+            <150
         </button>
         <div class="mdl-layout-spacer"></div>
     </div>
@@ -107,8 +183,12 @@
                     <th>ZDANIE STK</th>
                     <th>MIN</th>
                     <th>MAX</th>
-                    <th>POZOSTAŁO </br><span style="font-size:80%;">min</span></th>
-                    <th>POZOSTAŁO </br><span style="font-size:80%;">max</span></th>
+                    <th>POZOSTAŁO </br>TA </br><span style="font-size:80%;">min</span></th>
+                    <th>POZOSTAŁO </br>TA</br><span style="font-size:80%;">max</span></th>
+                    <th>POZOSTAŁO </br>ILD </br><span style="font-size:80%;">min</span></th>
+                    <th>POZOSTAŁO </br>ILD</br><span style="font-size:80%;">max</span></th>
+                    <th>W<4h</th>
+                    <th>FVM<10h</th>
                 </tr>
                 </thead>
                 <tbody id="ildTab" style="padding: 0px;">

@@ -69,14 +69,18 @@ if($h>=22 || $h<6)
     $zmiana=3;
 }
 
+//print($start);
+//print($end);
+
+
 $stid = oci_parse($ffmes_connection,"select cmpname,uni_raw.master_code,desc_tsize,desc_ttype,desc_rimd||'x'||desc_psep,actual_rim,test_status,cus_rsp_desc, count(char_barcode),sum(last_processed),
-                                            sum(case when final_rsp_desc = 'Renewal' and last_processed=1 then 1 else 0 end) renewal,
-                                            sum(case when final_rsp_desc = 'Replacement' and last_processed=1 then 1 else 0 end) replacement,
+                                            sum(case when final_rsp_desc = 'Collman' and last_processed=1 then 1 else 0 end) renewal,
+                                            sum(case when final_rsp_desc = 'Rynek' and last_processed=1 then 1 else 0 end) replacement,
                                             sum(case when final_rsp_desc = 'Scrap' and last_processed=1 then 1 else 0 end) scrap,
                                             sum(case when final_rsp_desc = 'OE' and last_processed=1 then 1 else 0 end) OE,
                                             sum(case when final_rsp_desc = 'SG OE' and last_processed=1 then 1 else 0 end) SG_OE,
                                             sum(case when final_rsp_desc = 'SG_RE' and last_processed=1 then 1 else 0 end) SG_RE
-                                            from uni_raw@plda5l2 left join ggs_code@plda5l2 on uni_raw.master_code=ggs_code.master_code
+                                            from uni_raw@plda5l2 left join ggs_code@plda5l2 on uni_raw.master_code=ggs_code.master_code and cftc=code_ftc
                                             left join
                                             (
                                                 select mach_name, desc_rimd||'x'||desc_psep actual_rim,test_status
@@ -129,16 +133,17 @@ while ($row = oci_fetch_array($stid, OCI_BOTH))
 
 
 $stid = oci_parse($ffmes_connection,"select machine_id, status, operator,cycle_time, last_scan, round((sysdate-last_scan)*24*60,0),mn3_test_status.*,nvl(time,0) from machine
-                                            left join mn3_test_status@plda5l2 on machine_id=mach_name 
+                                            left join mn3_test_status@plda5l2 on machine_id=mach_name
                                             left join
                                             (
-                                                select machine_id maszyna,round(sum((nvl(downtime_end,sysdate)-report_time)*24*60),0) time from downtime where 
-                                                    report_time between to_date('".$start." ".$start_hr.":00:00' ,'yyyy-mm-dd hh24:mi:ss') and to_date( '".$end." ".$end_hr.":00:00','yy-mm-dd hh24:mi:ss')
+                                                select machine_id maszyna,round(sum((nvl(downtime_end,sysdate)-report_time)*24*60),0) time from downtime where
+                                                    report_time between to_date('".$start." ".$start_hr.":00:00' ,'yy-mm-dd hh24:mi:ss') and to_date( '".$end." ".$end_hr.":00:00','yy-mm-dd hh24:mi:ss')
                                                     and downknd_id != 100
                                                     group by machine_id
                                             )
                                             on machine_id=maszyna
                                             where last_processed=1");
+
 oci_execute($stid);
 
 $fvmStatusArray=array();
@@ -163,8 +168,8 @@ $stid2 = oci_parse($ffmes_connection,"select nvl(nvl(ctc,cgtc),ct),nvl( nvl(nvl(
     (
     select distinct code_tic, desc_rimd ||'x'||desc_psep rozmiar from ggs_code@plda5l2 where code_act=1
     ) on ctc=code_tic
-    where end_time between 
-    to_date('".$start." ".$start_hr.":00:00' ,'yyyy-mm-dd hh24:mi:ss') and to_date( '".$end." ".$end_hr.":00:00','yy-mm-dd hh24:mi:ss')
+    where end_time between
+    to_date('".$start." ".$start_hr.":00:00' ,'yy-mm-dd hh24:mi:ss') and to_date( '".$end." ".$end_hr.":00:00','yy-mm-dd hh24:mi:ss')
     and resrce not like 'R%'
     group by ctc, rozmiar
 )
@@ -176,8 +181,8 @@ full outer join
     (
     select distinct code_tic, desc_rimd ||'x'||desc_psep rozmiar from ggs_code@plda5l2 where code_act=1
     ) on cgtc=code_tic
-    where dstamp between 
-    to_date('".$start." ".$start_hr.":00:00' ,'yyyy-mm-dd hh24:mi:ss') and to_date( '".$end." ".$end_hr.":00:00','yy-mm-dd hh24:mi:ss')
+    where dstamp between
+    to_date('".$start." ".$start_hr.":00:00' ,'yy-mm-dd hh24:mi:ss') and to_date( '".$end." ".$end_hr.":00:00','yy-mm-dd hh24:mi:ss')
     group by cgtc,rozmiar
 ) on ctc=cgtc
 full outer join
@@ -217,3 +222,4 @@ while ($row = oci_fetch_array($stid2, OCI_BOTH))
 $finalArray=array('SCORES' => $fvmArray, 'STATUS' => $fvmStatusArray, 'SIZES' => $sizesArray);
 echo json_encode($finalArray,JSON_NUMERIC_CHECK);
 //print_r($fvmArray);
+oci_close($ffmes_connection);

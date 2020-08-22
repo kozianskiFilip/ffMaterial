@@ -288,9 +288,45 @@
             array_push($massArray,array("defectNumber" => substr($row[0],6,4),"qty"=>$row[1], "desc" =>$row[0], "text" => "", "color" =>"#682912"));
         }
 
+        // 07.07.2020 DANE WYBRAKI GT
+        $gtDataArray=array();
+
+        $stid = oci_parse($ffmes_connection,"select defect_num, long_desc, sum(per_machine),
+                                        listagg(case when per_machine >=3 then tire_code || ' / ' || maszyna || '-' || per_machine || 'szt.' else null end, '</br>') within group(order by per_gt_code desc, per_machine desc) serie,
+                                        'GT'
+                                        from
+                                        (
+                                            select distinct
+                                            tire_code, 
+                                            long_desc, defect_num, maszyna ,
+                                            count(tire_code) over (partition by tire_code, defect_num) per_gt_code,
+                                            count(tire_code) over (partition by tire_code,defect_num, maszyna) per_machine
+                                            from
+                                            (
+                                            select tire_code,
+                                            long_desc,
+                                            df_entry.defect_num,
+                                            tbm_stage2 maszyna
+                                            from df_entry@plda5l2 left join df_defect_desc@plda5l2 on df_defect_desc.defect_num=df_entry.defect_num 
+                                            where df_entry.defect_type='G' and df_defect_desc.defect_type='G' and disposition in (1) 
+                                                    and update_date between to_date('".$start." ".$start_hr.":00:00','yy-mm-dd hh24:mi:ss') and to_date('".$end." ".$end_hr.":00:00','yy-mm-dd hh24:mi:ss') ".$areaQuery." ".$areaQuery."
+                                                    )
+                                        )
+                                        group by defect_num, long_desc order by sum(per_machine) desc");
+        oci_execute($stid);
+
+        $i=0;
+        while ($row = oci_fetch_array($stid, OCI_BOTH))
+        {
+            //  echo $row[1].'</br>';
+            $scrapsSummary[$row[4]]['qty']+=$row[2];
+            if($i<15)
+                array_push($gtDataArray,array("defectNumber" => $row[0],"qty"=>$row[2], "desc" =>$row[1], "text" => $row[3], "color" =>"#088548"));
+            $i++;
+        }
         //$dataArray=array(array_values($typeScrapsArray),$totalScrapsAmount);
         //print_r ($dataArray);
-        $dataArray=array_merge($scrapsSummary, array('DANE' => $dataArray),array('DANE_NAPRAWA' =>$repairArray), array('REPAIR' => $repairSummary), array("DANE_MASY" => $massArray));
+        $dataArray=array_merge($scrapsSummary, array('DANE' => $dataArray),array('DANE_NAPRAWA' =>$repairArray), array('REPAIR' => $repairSummary), array("DANE_MASY" => $massArray), array("DANE_GT" => $gtDataArray));
 		echo json_encode($dataArray,JSON_NUMERIC_CHECK);
 		oci_close($ffmes_connection);
 ?>

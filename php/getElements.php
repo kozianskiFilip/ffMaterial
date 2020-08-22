@@ -6,8 +6,8 @@
  * Time: 07:48
  */
 $ffmes_connection = oci_connect('minimes_ff_wbr', 'Baza0racl3appl1cs', '172.22.8.47/ORA');
-$ffmes = oci_connect('minimes_ff_wbr', 'Baza0racl3appl1cs', '172.22.8.47/ORA');
-$stid = oci_parse($ffmes, "select mat_group,material,sfc,storage_area || ' ' || storage_row || ' ' || storage_level, convoyer, qty, min_usage_date,to_char(expiry_date,'yy-mm-dd hh24:mi:ss'),to_char(prod_date,'yy-mm-dd hh24:mi:ss'),prod_machine,qa_reason,round((expiry_date-sysdate)*24,2),last_edit_date,deleted_from_prolag
+//$ffmes = oci_connect('minimes_ff_wbr', 'Baza0racl3appl1cs', '172.22.8.47/ORA');
+$stid = oci_parse($ffmes_connection, "select mat_group,material,sfc,storage_area || ' ' || storage_row || ' ' || storage_level, convoyer, qty, min_usage_date,to_char(expiry_date,'yy-mm-dd hh24:mi:ss'),to_char(prod_date,'yy-mm-dd hh24:mi:ss'),prod_machine,qa_reason,round((expiry_date-sysdate)*24,2),last_edit_date,deleted_from_prolag
                                     from prolag_prep_inv@prolag
                                     where prod_machine not like '%MRT%' and prod_machine !='QUADRO' and prod_machine !='FISHER' and qty < max_qty  and substr(storage_area,1,3)||storage_row !='TBM1'
                                     and deleted_from_prolag=0 

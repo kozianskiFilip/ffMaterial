@@ -24,7 +24,7 @@ var scrapChartRefreshMode=0; // DOMYŚLNIE DANE W WYKRESIE PREZENTUJĄ BIEŻĄC�
 var scrapChartAutoUpdate = 1; //AUTOMATYCZNA AKTUALIZACJA
 
 //update 4.03.2019 rozdzielenie H100 + WBR
-var h100=1;
+var h100=0;
 var wbr=1;
 
 //AKCJE DO PODWÓJNEGO/POJEDYNCZEGO KLIKNIECIA NA GLOWNY WYKRES
@@ -68,32 +68,7 @@ var wbr=1;
 
 
 $(document).ready(function() {
-    //SCRAPS CHART INIT/UPDATE
     updateDashboard();
-    //MAIN TABLE INIT/UPDATE
-    // statsInterval = setInterval(function () {
-    //     $.getJSON('php/getForecast.php', function(data)
-    //     {
-    //         shift=moment().format('HH');
-    //
-    //         if(shift >=6 && shift <14)
-    //             shiftPlan=data.MAIN_TABLE.PLAN1;
-    //         else if (shift >=14 && shift <22)
-    //             shiftPlan=data.MAIN_TABLE.PLAN2;
-    //         else
-    //             shiftPlan=data.MAIN_TABLE.PLAN3;
-    //
-    //         $('#curing').html("<span class='mdl-layout--large-screen-only'>"+data.MAIN_TABLE.CURING_OUTPUT+" /</span> "+data.MAIN_TABLE.CURING_PRED +"<br><span style='font-size: 80%'>("+(data.MAIN_TABLE.CURING_PRED-shiftPlan)+")</span>");
-    //         $('#inspection').html("<span class='mdl-layout--large-screen-only'>"+data.MAIN_TABLE.INSPECTION_OUTPUT+" /</span> "+data.MAIN_TABLE.INSPECTION_FORECAST+"<br><span style='font-size: 80%'>("+(data.MAIN_TABLE.INSPECTION_FORECAST-data.MAIN_TABLE.CURING_PRED)+")</span>");
-    //         $('#fvm').html("<span class='mdl-layout--large-screen-only'>"+data.MAIN_TABLE.FVM_OUTPUT+" /</span> "+data.MAIN_TABLE.FVM_FORECAST+"<br><span style='font-size: 80%'>("+(data.MAIN_TABLE.FVM_FORECAST-data.MAIN_TABLE.CURING_PRED)+")</span>");
-    //         $('#stock').html("<span class='mdl-layout--large-screen-only'>"+data.MAIN_TABLE.STOCK+"<br><span style='font-size: 80%'>("+(data.MAIN_TABLE.STOCK-data.MAIN_TABLE.LABO)+")</span>");
-    //
-    //         // inspectionChartData=data.MAIN_TABLE.SUPPORT_CHARTS.INSPECTION;
-    //         // inspectionChart();
-    //         // curingChartData=data.MAIN_TABLE.SUPPORT_CHARTS.CURING;
-    //         // curingChart();
-    //     });
-    //     },300000);
 });
 
 function mainTableFill()
@@ -478,6 +453,9 @@ function updateDashboard()
 
     mainTableFill();
     tableInterval=setInterval(mainTableFill, 300000) ;
+
+    fetchHoldsFVM();
+    holdsInterval=setInterval(fetchHoldsFVM, 600000) ;
 }
 
 function fvmPerf()
@@ -562,7 +540,8 @@ function scrapsShift()
         scrapsChart();
         supportScrapsChart(repairChartData,'backupChart1', "NAPRAWY");
         supportScrapsChart(data.DANE_MASY,'backupChart2', "MASY");
-
+        supportScrapsChart(data.DANE_GT,'gtScrapChart', "GREEN TIRE SCRAPS");
+        //alert(data.DANE_GT[1].desc);
         if(!scrapChartAutoUpdate)
             autoUpdateText='<span style="color: #9f0012; text-underline-style: wave; ">AUTOUPDATE OFF</span>';
        // alert(autoUpdateText);
@@ -573,3 +552,42 @@ function scrapsShift()
        // chart.animateAgain();
     });
 }
+
+
+//KARTY WSTRZYMANIA
+var holdsArray=[];
+var holdsObject={};
+
+function fetchHoldsFVM()
+{
+  //   alert(moment());
+    $.getJSON('php/getHolds.php', function (data) {
+        //alert(data.length);
+        for (var i = 0; i < data.length; i++) {
+
+            if(holdsArray.includes(data[i].KEY))
+                continue;
+
+            holdsArray.push(data[i].KEY);
+
+            if(data[i].TOT>=5)
+                $("#holdCards").append("<div class=\"alert alert-danger\" role=\"alert\">" +
+                    "<button type=\"button\" class=\"close-alert\" onclick=\"$(this).parent().remove();\">×</button>" +
+                    data[i].CODE + " <b>"+data[i].TOT+"x " +data[i].DESC+"</b> - TBM:"+data[i].TBM +", "+data[i].OPERATOR+" "+data[i].DAY+"/"+data[i].SHIFT+ "zm. - "+data[i].FVMS+
+                    " </div>");
+            else
+                $("#holdCards").append("<div class=\"alert alert-warning\" role=\"alert\">" +
+                    "<button type=\"button\" class=\"close-alert\" onclick=\"$(this).parent().remove();\">×</button>" +
+                    data[i].CODE + " <b>"+data[i].TOT+"x " +data[i].DESC+"</b> - TBM:"+data[i].TBM +", "+data[i].OPERATOR+" "+data[i].DAY+"/"+data[i].SHIFT+ "zm. - "+data[i].FVMS+
+                    " </div>");
+            //alert(data[i].FVM_HOLDS.CODE);
+        }
+    });
+}
+
+// $(".no-spam").click(function(){
+//     alert('qwe');
+//     var t = this;
+//     t.disabled = true;
+//     setTimeout(function() {t.disabled = false;},5000);
+// });
