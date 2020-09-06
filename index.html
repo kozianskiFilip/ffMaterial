@@ -162,6 +162,15 @@
                 <div class="mdl-grid  mdl-grid--no-spacing">
                     <div class = "mdl-layout-spacer"></div>
                     <div class="mdl-cell mdl-cell--12-col-phone mdl-cell--10-col-desktop mdl-cell--10-col-tablet" style="align-items: center; text-align: center;">
+                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored no-spam" style="background-color: #000000" onclick="scrapChartRefreshMode=10; daysBack=1; scrapsShift(); clearInterval(scrapInterval); scrapChartAutoUpdate = 0;">
+                            D-1
+                        </button>
+                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored no-spam" style="background-color: #000000" onclick="scrapChartRefreshMode=10; daysBack=2; scrapsShift(); clearInterval(scrapInterval); scrapChartAutoUpdate = 0;">
+                            D-2
+                        </button>
+                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored no-spam" style="background-color: #000000" onclick="scrapChartRefreshMode=10; daysBack=3; scrapsShift(); clearInterval(scrapInterval); scrapChartAutoUpdate = 0;">
+                            D-3
+                        </button>
                         <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored no-spam" onclick="scrapChartRefreshMode=1 ;scrapsShift(); clearInterval(scrapInterval); scrapChartAutoUpdate = 0;">
                             ZM1
                         </button>
@@ -219,10 +228,23 @@
                     </div>
                     <div class = "mdl-layout-spacer"></div>
                 </div>
+                <!--WYKRES WYBRAKÓW PO GT-->
+                <div class="mdl-grid  mdl-grid--no-spacing">
+                    <div class = "mdl-layout-spacer"></div>
+                    <div id="gtParetoChart" style=" height:300px;" class="mdl-cell mdl-cell--12-col-phone mdl-cell--10-col-desktop mdl-cell--10-col-tablet">
+                        <div id="p3" class="mdl-progress mdl-js-progress mdl-progress__indeterminate" style="width:100%;"></div>
+                    </div>
+                    <div class = "mdl-layout-spacer"></div>
+                </div>
                 <!--GT/YIELD CHARTS-->
                 <div id="additionalCharts" class="mdl-grid mdl-grid--no-spacing">
                     <div class = "mdl-layout-spacer"></div>
-                    <div id="gtScrapChart" class="mdl-cell mdl-cell--12-col-phone mdl-cell--10-col-desktop mdl-cell--10-col-table" style="height:200px; "></div>
+                    <div id="gtScrapChart" class="mdl-cell mdl-cell--12-col-phone mdl-cell--10-col-desktop mdl-cell--10-col-table" style="height:300px; "></div>
+                    <div class = "mdl-layout-spacer"></div>
+                </div>
+                <div id="additionalCharts" class="mdl-grid mdl-grid--no-spacing">
+                    <div class = "mdl-layout-spacer"></div>
+                    <div id="pressScrapChart" class="mdl-cell mdl-cell--12-col-phone mdl-cell--10-col-desktop mdl-cell--10-col-table" style="height:300px; "></div>
                     <div class = "mdl-layout-spacer"></div>
                 </div>
                 <!--BACKUP CHARTS-->

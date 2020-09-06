@@ -6,7 +6,7 @@
  * Time: 17:03
  */
 
-		error_reporting(0);
+		error_reporting(E_ALL);
 		$ffmes_connection = oci_connect('minimes_ff_wbr', 'Baza0racl3appl1cs', '172.22.8.47/ORA');
 		$h=date('H');
 
@@ -163,12 +163,14 @@
         {
             $areaQuery = " and press not like 'V%' and press not like 'U%' ";
             $areaQueryRepair=" and prscav not like 'V%' and prscav not like 'U%' ";
+            $areaQueryGt=" and (tbm_stage2 not like '%1H%' or tbm_stage1 not like '%1H%')";
         }
 
         else if($_GET['h100'] == 1 and $_GET['wbr'] == 0)
         {
             $areaQuery = " and (press  like 'V%' or press like 'U%') ";
             $areaQueryRepair=" and (prscav  like 'V%' or prscav like 'U%') ";
+            $areaQueryGt=" and (tbm_stage2 like '%1H%' or tbm_stage1  like '%1H%')";
         }
 
         else
@@ -184,7 +186,34 @@
         $areaQueryRepair='';
     }
 
+
 }
+
+//UPDATE 23.08.2020 - możliwość generowania dla N kilku dni wstecz
+if ($_GET['mode'] == 10) {
+
+        $start=new DateTime();
+        $start->sub(new DateInterval('P'.$_GET['x'].'D'));
+        $start=date_format ( $start, 'y-m-d');
+        $end=new DateTime();
+        $end->sub(new DateInterval('P'.($_GET['x']-1).'D'));
+        $end=date_format ( $end, 'y-m-d');
+
+    $start_hr = 6;
+    $end_hr = 6;
+}
+
+$entry_build_mode=0;
+
+if(isset($_GET['mode2']))
+{
+    $entry_build=$_GET['mode2'];
+}
+
+if(!$entry_build_mode)
+    $modifierQuery='UPDATE_DATE';
+else
+    $modifierQuery='STAGE2_DATE';
 
         $scrapsSummary=array('BUILDING' => array('qty' =>0, 'color' =>'#f8fc00') , 'UNI' => array('qty' =>0, 'color' =>'#ef8904'), 'CURING' => array('qty' =>0, 'color' =>'#ef0404'));
         $dataArray=array();
@@ -216,7 +245,7 @@
                                         end maszyna
                                         from df_entry@plda5l2 left join df_defect_desc@plda5l2 on df_defect_desc.defect_num=df_entry.defect_num 
                                         where df_entry.defect_type='C' and df_defect_desc.defect_type='C' and disposition in (1) 
-                                        and update_date between to_date('".$start." ".$start_hr.":00:00','yy-mm-dd hh24:mi:ss') and to_date('".$end." ".$end_hr.":00:00','yy-mm-dd hh24:mi:ss') ".$areaQuery." ".$areaQuery."
+                                        and ".$modifierQuery." between to_date('".$start." ".$start_hr.":00:00','yy-mm-dd hh24:mi:ss') and to_date('".$end." ".$end_hr.":00:00','yy-mm-dd hh24:mi:ss') ".$areaQuery." ".$areaQuery."
                                         )
                                 )
                                 group by defect_num, long_desc order by sum(per_machine) desc");
@@ -290,43 +319,109 @@
 
         // 07.07.2020 DANE WYBRAKI GT
         $gtDataArray=array();
+        $gtMachinesArray=array('KRUPP'=>0,'PLT'=>0, 'TRAD'=>0);
 
-        $stid = oci_parse($ffmes_connection,"select defect_num, long_desc, sum(per_machine),
-                                        listagg(case when per_machine >=3 then tire_code || ' / ' || maszyna || '-' || per_machine || 'szt.' else null end, '</br>') within group(order by per_gt_code desc, per_machine desc) serie,
-                                        'GT'
-                                        from
-                                        (
-                                            select distinct
-                                            tire_code, 
-                                            long_desc, defect_num, maszyna ,
-                                            count(tire_code) over (partition by tire_code, defect_num) per_gt_code,
-                                            count(tire_code) over (partition by tire_code,defect_num, maszyna) per_machine
-                                            from
-                                            (
-                                            select tire_code,
-                                            long_desc,
-                                            df_entry.defect_num,
-                                            tbm_stage2 maszyna
-                                            from df_entry@plda5l2 left join df_defect_desc@plda5l2 on df_defect_desc.defect_num=df_entry.defect_num 
-                                            where df_entry.defect_type='G' and df_defect_desc.defect_type='G' and disposition in (1) 
-                                                    and update_date between to_date('".$start." ".$start_hr.":00:00','yy-mm-dd hh24:mi:ss') and to_date('".$end." ".$end_hr.":00:00','yy-mm-dd hh24:mi:ss') ".$areaQuery." ".$areaQuery."
-                                                    )
-                                        )
-                                        group by defect_num, long_desc order by sum(per_machine) desc");
+        $stid = oci_parse($ffmes_connection,"select tbm_stage2,sum(suma), listagg(tire_code || ':</br>' || descript) within group(order by suma desc),group_id 
+                                                        from
+                                                        (
+                                                            select tbm_stage2,tire_code, sum(il) suma, listagg(il || 'x ' || long_desc || ' </br>') within group(order by il desc) descript
+                                                            from(
+                                                                    select nvl(tbm_stage2,tbm_stage1) tbm_stage2,tire_code, df_entry.defect_num, long_desc, count(barcode) il
+                                                                    from df_entry@plda5l2
+                                                                    left join df_defect_desc@plda5l2 on df_defect_desc.defect_type=df_entry.defect_type and df_defect_desc.defect_num=df_entry.defect_num
+                                                                    where ".$modifierQuery." between to_date('".$start." ".$start_hr.":00:00','yy-mm-dd hh24:mi:ss') and to_date('".$end." ".$end_hr.":00:00','yy-mm-dd hh24:mi:ss') ".$areaQueryGt." and df_defect_desc.defect_type='G' and df_entry.defect_type='G' and disposition in (1,8) 
+                                                                    group by nvl(tbm_stage2,tbm_stage1),tire_code, df_entry.defect_num, long_desc
+                                                            ) group by tbm_stage2,tire_code
+                                                        )
+                                                        left join machines@bld on name=tbm_stage2
+                                                        group by tbm_stage2,group_id order by sum(suma) desc");
         oci_execute($stid);
 
         $i=0;
         while ($row = oci_fetch_array($stid, OCI_BOTH))
         {
             //  echo $row[1].'</br>';
-            $scrapsSummary[$row[4]]['qty']+=$row[2];
+            //$scrapsSummary[$row[4]]['qty']+=$row[2];
+
+            if($row[3]=='Krupp')
+                $gtMachinesArray['KRUPP']+=$row[1];
+            else if($row[3]=='PLT')
+                $gtMachinesArray['PLT']+=$row[1];
+            else
+                $gtMachinesArray['TRAD']+=$row[1];
+
             if($i<15)
-                array_push($gtDataArray,array("defectNumber" => $row[0],"qty"=>$row[2], "desc" =>$row[1], "text" => $row[3], "color" =>"#088548"));
+                array_push($gtDataArray,array("defectNumber" => $row[0],"qty"=>$row[1], "desc" =>$row[2]));
             $i++;
         }
-        //$dataArray=array(array_values($typeScrapsArray),$totalScrapsAmount);
-        //print_r ($dataArray);
-        $dataArray=array_merge($scrapsSummary, array('DANE' => $dataArray),array('DANE_NAPRAWA' =>$repairArray), array('REPAIR' => $repairSummary), array("DANE_MASY" => $massArray), array("DANE_GT" => $gtDataArray));
+    //22.08.2020 wybraki po kodzie GT
+    {
+        $topGt = array();
+
+        $stid = oci_parse($ffmes_connection, "select tire_code, dept_group,color,suma, descript, sum(suma) over(partition by tire_code order by tire_code) sum_code
+                                                        from
+                                                        (
+                                                            select tire_code,dept_group,color, sum(il) suma, listagg(il || 'x ' || long_desc || ' </br>') within group(order by il desc) descript
+                                                            from
+                                                            (
+                                                                select tire_code,df_entry.defect_num, long_desc,dept_group,color, count(barcode) il
+                                                                from df_entry@plda5l2
+                                                                left join df_defect_desc@plda5l2 on df_defect_desc.defect_type=df_entry.defect_type and df_defect_desc.defect_num=df_entry.defect_num
+                                                                left join ff_defect_groups on df_entry.defect_num=defect_number
+                                                                where  ".$modifierQuery." between to_date('".$start." ".$start_hr.":00:00','yy-mm-dd hh24:mi:ss') and to_date('".$end." ".$end_hr.":00:00','yy-mm-dd hh24:mi:ss')  ".$areaQuery." and df_defect_desc.defect_type='C' and df_entry.defect_type='C' and disposition=1
+                                                                group by tire_code,df_entry.defect_num, long_desc,dept_group,color
+                                                            )
+                                                            group by tire_code,dept_group,color
+                                                        ) order by sum(suma) over(partition by tire_code order by tire_code) desc, tire_code, suma desc");
+        oci_execute($stid);
+        $kodGt='';
+        $i = 0;
+        while ($row = oci_fetch_array($stid, OCI_BOTH) ) {
+
+            if($kodGt !=$row[0] )
+            {
+                array_push($topGt,array('KOD'=> $row[0],'SUMA'=>$row[5],'WULK'=>0,'WULK_TEXT'=>'','KONF'=>0,'KONF_TEXT'=>'','UNI'=>0,'UNI_TEXT'=>''));
+                $i++;
+            }
+
+            $topGt[$i-1][$row[1]]=$row[3];
+            $topGt[$i-1][$row[1].'_TEXT']=$row[4];
+            $kodGt=$row[0];
+
+            if($i==15)
+                break;
+        }
+    }
+
+//27.08.2020 wybraki po prasie
+{
+    $press = array();
+
+    $stid = oci_parse($ffmes_connection, "select prasa, sum(il),listagg(il||'x '||long_desc||'</br>') within group(order by il desc) text
+                                                    from
+                                                    (
+                                                    select substr(press,1,3) prasa,df_entry.defect_num, long_desc,dept_group,color, count(barcode) il
+                                                    from df_entry@plda5l2
+                                                    left join df_defect_desc@plda5l2 on df_defect_desc.defect_type=df_entry.defect_type and df_defect_desc.defect_num=df_entry.defect_num
+                                                    left join ff_defect_groups on df_entry.defect_num=defect_number
+                                                    where  ".$modifierQuery." between to_date('".$start." ".$start_hr.":00:00','yy-mm-dd hh24:mi:ss') and to_date('".$end." ".$end_hr.":00:00','yy-mm-dd hh24:mi:ss') ".$areaQuery." 
+                                                    and df_defect_desc.defect_type='C' and df_entry.defect_type='C' and disposition=1 and dept_group='WULK'
+                                                    group by substr(press,1,3),df_entry.defect_num, long_desc,dept_group,color
+                                                    ) group by prasa order by sum(il) desc");
+    oci_execute($stid);
+    $i = 0;
+    while ($row = oci_fetch_array($stid, OCI_BOTH) ) {
+
+
+            array_push($press, array('PRASA'=> $row[0],'SUMA'=>$row[1],'TEXT'=>$row[2]));
+            $i++;
+
+        if($i==15)
+            break;
+    }
+}
+
+        $dataArray=array_merge($scrapsSummary,array('PRESS_SCRAPS' => $press), array('GT_SCP_QTY' => $gtMachinesArray),array('TOP_GT' => $topGt), array('DANE' => $dataArray),array('DANE_NAPRAWA' =>$repairArray), array('REPAIR' => $repairSummary), array("DANE_MASY" => $massArray), array("DANE_GT" => $gtDataArray));
 		echo json_encode($dataArray,JSON_NUMERIC_CHECK);
 		oci_close($ffmes_connection);
 ?>

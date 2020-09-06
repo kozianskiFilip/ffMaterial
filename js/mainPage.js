@@ -4,6 +4,7 @@ AmCharts.lastClick = 0; // last click timestamp
 AmCharts.doubleClickDuration = 300;
 
 var chartData;
+var gtParetoChartData;
 var repairChartData;
 var inspectionChartData;
 var curingChartData;
@@ -22,6 +23,8 @@ var scrapInterval;
 
 var scrapChartRefreshMode=0; // DOMYŚLNIE DANE W WYKRESIE PREZENTUJĄ BIEŻĄCĄ DOBĘ
 var scrapChartAutoUpdate = 1; //AUTOMATYCZNA AKTUALIZACJA
+//update 23.08.2020
+var daysBack = 0; //ZMIENNA ILOŚCI DNI WSTECZ DLA WYKRESÓW WYBRAKÓW
 
 //update 4.03.2019 rozdzielenie H100 + WBR
 var h100=0;
@@ -384,7 +387,9 @@ function scrapsChart() {
         graph.balloonText = "[[desc]]: </br><b>[[text]]</b>";
         graph.labelText="[[qty]]";
         graph.type = "column";
-        graph.lineAlpha = 0;
+        graph.lineColor="#000000";
+        graph.lineThickness=1.5;
+        graph.lineAlpha = 1;
         graph.fillAlphas = 1;
         graph.colorField= "color";
         chart.addGraph(graph);
@@ -525,10 +530,11 @@ function fvmPerf()
 
 function scrapsShift()
 {
-    $.getJSON('php/getScraps.php?mode='+scrapChartRefreshMode+'&h100='+h100+'&wbr='+wbr, function(data)
+    $.getJSON('php/getScraps.php?mode='+scrapChartRefreshMode+'&h100='+h100+'&wbr='+wbr+'&x='+daysBack, function(data)
     {
         var autoUpdateText='<span style="color: #1b7a00; text-underline-style: wave; ">AUTOUPDATE ON</span>';
         chartData=data.DANE;
+        gtParetoChartData=data.TOP_GT;
         buildingScraps=data.BUILDING.qty;
         curingScraps=data.CURING.qty;
         uniScraps=data.UNI.qty;
@@ -538,9 +544,11 @@ function scrapsShift()
         //$('#test').html(data.DANE[1]);
         //chart.dataProvider(chartData);
         scrapsChart();
+        topGtScrapsChart();
         supportScrapsChart(repairChartData,'backupChart1', "NAPRAWY");
+        pressScrapsChart(data.PRESS_SCRAPS,'pressScrapChart', "WYBRAKI WG. PRAS WULKANIZACYJNYCH");
         supportScrapsChart(data.DANE_MASY,'backupChart2', "MASY");
-        supportScrapsChart(data.DANE_GT,'gtScrapChart', "GREEN TIRE SCRAPS");
+        greenScrapsChart(data.DANE_GT,'gtScrapChart', "GREEN TIRE SCRAPS "+(data.GT_SCP_QTY.KRUPP+data.GT_SCP_QTY.PLT+data.GT_SCP_QTY.TRAD)+", PLT: "+data.GT_SCP_QTY.PLT+", KRUPP: "+data.GT_SCP_QTY.KRUPP+", TRAD: "+data.GT_SCP_QTY.TRAD);
         //alert(data.DANE_GT[1].desc);
         if(!scrapChartAutoUpdate)
             autoUpdateText='<span style="color: #9f0012; text-underline-style: wave; ">AUTOUPDATE OFF</span>';
@@ -591,3 +599,180 @@ function fetchHoldsFVM()
 //     t.disabled = true;
 //     setTimeout(function() {t.disabled = false;},5000);
 // });
+
+//22.08.2020 WYBRAKI PO KODACH GT PARETO
+function topGtScrapsChart() {
+    // SERIAL CHART
+    chart = new AmCharts.AmSerialChart();
+    chart.dataProvider = gtParetoChartData;
+    chart.categoryField = "KOD";
+    chart.startDuration = 1;
+    // chart.addTitle("TOTAL: "+(buildingScraps+uniScraps+curingScraps)+", CURING: "+curingScraps+" / BUILDING: "+buildingScraps+" / UNI: "+uniScraps+ " "+moment().format('HH:mm:ss'));
+
+    // AXES
+    // category
+    var categoryAxis = chart.categoryAxis;
+    categoryAxis.labelRotation = 35;
+    categoryAxis.gridPosition = "start";
+
+
+    // GRAPH SUMA PO KODZIE
+    var graph = new AmCharts.AmGraph();
+    graph.valueField = "SUMA";
+    graph.balloonText = "[[KOD]]: </br><b>[[SUMA]]</b>";
+    graph.labelText="[[SUMA]]";
+    graph.lineColor="#000000";
+    graph.fillColors="#5f8cf4";
+    graph.type = "column";
+    graph.bullet = "line";
+    graph.bulletSize = 8;
+  //  graph.bulletBorderColor = "#000000";
+  //  / graph.lineAlpha = 0;
+    graph.fillAlphas = 1;
+   // graph.strokeWidth=0;
+    graph.bulletType='line';
+    graph.behindColumns = true;
+    graph.lineThickness=1.76;
+    //graph.stackable=false;
+    graph.clustered=false;
+   // graph.colorField= "color";
+    chart.addGraph(graph);
+
+    // GRAPH WULKANIZACJA
+    var graphCuring = new AmCharts.AmGraph();
+    graphCuring.valueField = "WULK";
+    graphCuring.balloonText = "WULKANIZACJA: </br><b>[[WULK_TEXT]]</b>";
+    graphCuring.labelText="[[WULK]]";
+    graphCuring.type = "column";
+    //graphCuring.lineAlpha = 1;
+    graphCuring.lineThickness=1;
+    graphCuring.lineColor="#000000";
+    graphCuring.fillAlphas = 1;
+    graphCuring.lineColor="#ef0404";
+    // graphCuring.colorField= "color";
+    chart.addGraph(graphCuring);
+
+    // GRAPH KONFEKCJA
+    var graphBuilding = new AmCharts.AmGraph();
+    graphBuilding.valueField = "KONF";
+    graphBuilding.balloonText = "KONFEKCJA: </br><b>[[KONF_TEXT]]</b>";
+    graphBuilding.labelText="[[KONF]]";
+    graphBuilding.type = "column";
+    graphBuilding.lineAlpha = 0;
+    graphBuilding.fillAlphas = 1;
+    graphBuilding.fillColors="#f8fc00";
+    graphBuilding.lineColor="#000000";
+    // graphBuilding.colorField= "color";
+    chart.addGraph(graphBuilding);
+
+    // GRAPH UNIFORMITY
+    var graphUniformity = new AmCharts.AmGraph();
+    graphUniformity.valueField = "UNI";
+    graphUniformity.balloonText = "UNIFORMITY: </br><b>[[UNI_TEXT]]</b>";
+    graphUniformity.labelText="[[UNI]]";
+    graphUniformity.type = "column";
+    graphUniformity.lineAlpha = 0;
+    graphUniformity.fillAlphas = 1;
+    graphUniformity.lineColor="#ef8904";
+    // graphUniformity.colorField= "color";
+    chart.addGraph(graphUniformity);
+    
+    
+    // CURSOR
+    var chartCursor = new AmCharts.ChartCursor();
+    chartCursor.cursorAlpha = 0;
+    chartCursor.zoomable = false;
+    chartCursor.categoryBalloonEnabled = false;
+    chartCursor.oneBalloonOnly=true;
+    chart.addChartCursor(chartCursor);
+
+    chart.addListener('clickGraphItem', AmCharts.myClickHandler);
+    chart.creditsPosition = "top-right";
+    chart.write("gtParetoChart");
+}
+
+function greenScrapsChart(supportChartData,supportChartContainer, chartTitle) {
+    // SERIAL CHART
+    chart = new AmCharts.AmSerialChart();
+    chart.dataProvider = supportChartData;
+    chart.categoryField = "defectNumber";
+    chart.startDuration = 1;
+    chart.addTitle(chartTitle+" "+moment().format('HH:mm:ss'));
+
+    // AXES
+    // category
+    var categoryAxis = chart.categoryAxis;
+    categoryAxis.labelRotation = 30;
+    categoryAxis.gridPosition = "start";
+
+
+    // GRAPH
+    var graph = new AmCharts.AmGraph();
+
+    graph.valueField = "qty";
+    graph.balloonText = "[[desc]]: </br><b>[[text]]</b>";
+    graph.balloonText.fontSize=8;
+    graph.labelText="[[qty]]";
+    graph.type = "column";
+    graph.lineColor="#000000";
+    graph.lineAlpha = 1;
+    graph.fillAlphas = 1;
+    graph.fillColors="#33a247";
+    graph.lineThickness=1.5;
+    chart.addGraph(graph);
+
+
+    // CURSOR
+    var chartCursor = new AmCharts.ChartCursor();
+    chartCursor.cursorAlpha = 0;
+    chartCursor.zoomable = false;
+    chartCursor.categoryBalloonEnabled = false;
+    chart.addChartCursor(chartCursor);
+
+    chart.addListener('clickGraphItem', AmCharts.myClickHandler);
+    chart.creditsPosition = "top-right";
+    chart.write(supportChartContainer);
+}
+
+function pressScrapsChart(supportChartData,supportChartContainer, chartTitle) {
+    // SERIAL CHART
+    chart = new AmCharts.AmSerialChart();
+    chart.dataProvider = supportChartData;
+    chart.categoryField = "PRASA";
+    chart.startDuration = 1;
+    chart.addTitle(chartTitle+" "+moment().format('HH:mm:ss'));
+
+    // AXES
+    // category
+    var categoryAxis = chart.categoryAxis;
+    categoryAxis.labelRotation = 30;
+    categoryAxis.gridPosition = "start";
+
+
+    // GRAPH
+    var graph = new AmCharts.AmGraph();
+
+    graph.valueField = "SUMA";
+    graph.balloonText = "[[PRASA]]: </br><b>[[TEXT]]</b>";
+    graph.balloonText.fontSize=8;
+    graph.labelText="[[SUMA]]";
+    graph.type = "column";
+    graph.lineColor="#000000";
+    graph.lineAlpha = 1;
+    graph.fillAlphas = 1;
+    graph.fillColors="#3f6a73";
+    graph.lineThickness=1.5;
+    chart.addGraph(graph);
+
+
+    // CURSOR
+    var chartCursor = new AmCharts.ChartCursor();
+    chartCursor.cursorAlpha = 0;
+    chartCursor.zoomable = false;
+    chartCursor.categoryBalloonEnabled = false;
+    chart.addChartCursor(chartCursor);
+
+    chart.addListener('clickGraphItem', AmCharts.myClickHandler);
+    chart.creditsPosition = "top-right";
+    chart.write(supportChartContainer);
+}
